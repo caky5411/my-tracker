@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>任務指揮台</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+:root {
+  --bg: #f5f5f3;
+  --s1: #ffffff;
+  --s2: #f9f9f8;
+  --s3: #f0f0ee;
+  --border: #e0e0dc;
+  --text: #1a1a18;
+  --muted: #888884;
+  --dim: #b0b0ac;
+  --green: #2a8c4a;
+  --amber: #b8800a;
+  --red: #c04040;
+  --blue: #2a72b8;
+  --tag: #ededea;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; }
+
+/* ── NAV ── */
+nav {
+  background: var(--s1);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  height: 52px;
+  gap: 0;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--amber);
+  letter-spacing: 3px;
+  margin-right: 32px;
+  white-space: nowrap;
+}
+.tab-btn {
+  background: none; border: none;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 0 18px;
+  height: 52px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
+
+.nav-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+
+.pill {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 20px;
+}
+.pill.can-move { border-color: var(--green); color: var(--green); }
+
+.add-btn {
+  background: var(--text);
+  color: #fff;
+  border: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 7px 16px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+}
+.add-btn:hover { background: #333; }
+
+/* ── TABS ── */
+.tab-panel { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
+.tab-panel.active { display: block; }
+
+/* ── FOCUS BAR ── */
+.focus-bar {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.focus-bar .label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--green);
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+.focus-chips { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+.focus-chip {
+  background: var(--s3);
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-size: 12px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.focus-chip:hover { background: #1e2e1e; }
+.focus-empty { font-size: 12px; color: var(--muted); font-style: italic; }
+
+/* ── PROJECT CARDS ── */
+.projects-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.pcard {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--blue);
+  transition: border-color 0.2s;
+}
+.pcard.has-urgent { border-left-color: var(--red); }
+.pcard.all-waiting { border-left-color: var(--muted); }
+
+.pcard-head {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+.pcard-head:hover .pname { color: var(--amber); }
+
+.pname { font-size: 15px; font-weight: 500; transition: color 0.15s; }
+.pmeta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+.lane-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+.lpill {
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  padding: 2px 9px;
+  border: 1px solid;
+  border-radius: 2px;
+}
+.lpill.go { border-color: var(--green); color: var(--green); }
+.lpill.wait { border-color: var(--dim); color: var(--dim); }
+
+.icon-btn {
+  background: none; border: 1px solid var(--border);
+  color: var(--muted);
+  width: 26px; height: 26px;
+  cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.icon-btn:hover { border-color: var(--amber); color: var(--amber); }
+.icon-btn.del:hover { border-color: var(--red); color: var(--red); }
+
+/* ── CARD BODY ── */
+.pcard-body { display: none; border-top: 1px solid var(--border); }
+.pcard-body.open { display: block; }
+
+.pcard-inner { padding: 16px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) { .pcard-inner { grid-template-columns: 1fr; } }
+
+.field-block { display: flex; flex-direction: column; gap: 6px; }
+.field-block.full { grid-column: 1 / -1; }
+
+.flabel {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+textarea.fld, input.fld {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 13px;
+  padding: 9px 11px;
+  resize: vertical;
+  line-height: 1.7;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+textarea.fld { min-height: 70px; }
+textarea.fld:focus, input.fld:focus { outline: none; border-color: var(--blue); }
+textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
+
+/* ── LANES SECTION ── */
+.lanes-section { grid-column: 1 / -1; }
+
+.lanes-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+
+.lanes-list { display: flex; flex-direction: column; gap: 8px; }
+
+.lane-item {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--dim);
+  padding: 10px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: border-color 0.2s;
+}
+.lane-item.go { border-left-color: var(--green); }
+.lane-item.wait { border-left-color: var(--amber); opacity: 0.75; }
+
+.lane-status-btn {
+  background: none; border: 1px solid var(--dim);
+  color: var(--dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  padding: 3px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  margin-top: 1px;
+  letter-spacing: 1px;
+}
+.lane-item.go .lane-status-btn { border-color: var(--green); color: var(--green); }
+.lane-item.wait .lane-status-btn { border-color: var(--amber); color: var(--amber); }
+.lane-status-btn:hover { opacity: 0.7; }
+
+.lane-content { flex: 1; }
+.lane-name { font-size: 13px; font-weight: 500; }
+.lane-detail {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+  line-height: 1.5;
+}
+.lane-wait-reason {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--amber);
+  margin-top: 4px;
+}
+
+.lane-eta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.lane-edit-btn {
+  background: none; border: none;
+  color: var(--dim); cursor: pointer; font-size: 13px;
+  padding: 2px 4px; flex-shrink: 0;
+  transition: color 0.15s;
+}
+.lane-edit-btn:hover { color: var(--amber); }
+
+/* add lane row */
+.add-lane-row {
+  background: var(--s2);
+  border: 1px dashed var(--border);
+  padding: 8px 12px;
+  display: flex; gap: 8px; align-items: center;
+}
+.add-lane-row input, .add-lane-row select {
+  background: none; border: none;
+  color: var(--text);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 13px;
+  flex: 1;
+}
+.add-lane-row input:focus, .add-lane-row select:focus { outline: none; }
+.add-lane-row input::placeholder { color: var(--dim); }
+.add-lane-row select { color: var(--muted); max-width: 100px; background: var(--s2); }
+.add-lane-row select option { background: var(--s2); }
+
+/* ── TODAY VIEW ── */
+.today-header {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+}
+.today-date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+.section-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: var(--border);
+}
+
+.today-go { margin-bottom: 28px; }
+.today-wait { opacity: 0.8; }
+
+.today-lane {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.today-lane.wait { border-left-color: var(--dim); background: var(--s2); }
+
+.tl-project {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+  padding-top: 2px;
+  min-width: 100px;
+}
+.tl-name { font-size: 14px; font-weight: 500; }
+.tl-detail { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+.tl-wait-reason { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--amber); margin-top: 4px; }
+
+.tl-toggle {
+  margin-left: auto;
+  background: none; border: 1px solid var(--border);
+  color: var(--dim); cursor: pointer; font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  padding: 3px 9px; white-space: nowrap;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.tl-toggle:hover { border-color: var(--green); color: var(--green); }
+.today-lane.wait .tl-toggle:hover { border-color: var(--amber); color: var(--amber); }
+
+/* ── MODAL ── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 200; align-items: center; justify-content: center;
+}
+.overlay.open { display: flex; }
+
+.modal {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  width: 460px; max-width: 94vw;
+  padding: 26px;
+  animation: mfade 0.18s;
+}
+@keyframes mfade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal h2 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px; letter-spacing: 3px; color: var(--amber);
+  margin-bottom: 18px;
+}
+.fg { margin-bottom: 13px; }
+.fl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); display: block; margin-bottom: 5px; letter-spacing: 1px; }
+.fi {
+  width: 100%; background: var(--s2); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Noto Sans TC', sans-serif;
+  font-size: 13px; padding: 9px 11px;
+}
+.fi:focus { outline: none; border-color: var(--blue); }
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+.mbtn {
+  background: var(--amber); color: #fff;
+  border: none; font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; font-weight: 600; padding: 9px 22px; cursor: pointer;
+  transition: all 0.15s;
+}
+.mbtn:hover { background: #f5cd6a; }
+.mbtn.cancel {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+}
+.mbtn.cancel:hover { border-color: var(--muted); color: var(--text); }
+
+/* lane modal */
+.lane-modal-status {
+  display: flex; gap: 8px;
+}
+.lms-btn {
+  flex: 1; padding: 8px; text-align: center;
+  border: 1px solid var(--border); cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  background: none; color: var(--muted);
+  transition: all 0.15s;
+}
+.lms-btn.sel.go { border-color: var(--green); color: var(--green); background: #edf7f0; }
+.lms-btn.sel.wait { border-color: var(--amber); color: var(--amber); background: #fdf6e8; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--s3); border: 1px solid var(--border);
+  color: var(--text); font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; padding: 9px 16px; z-index: 300;
+  opacity: 0; transition: opacity 0.25s; pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+.empty-state {
+  text-align: center; padding: 50px 20px; color: var(--muted);
+}
+.empty-state .icon { font-size: 32px; margin-bottom: 10px; }
+.empty-state p { font-size: 13px; line-height: 1.9; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">CONTROL</div>
+  <button class="tab-btn active" onclick="switchTab('today')">TODAY</button>
+  <button class="tab-btn" onclick="switchTab('projects')">PROJECTS</button>
+  <div class="nav-right">
+    <span class="pill can-move" id="navGo">0 可推進</span>
+    <span class="pill" id="navWait">0 等待中</span>
+    <button class="add-btn" id="navAddBtn" onclick="openProjectModal()">＋ 新增專案</button>
+  </div>
+</nav>
+
+<!-- TODAY TAB -->
+<div class="tab-panel active" id="tab-today">
+  <div class="today-header">
+    <div style="font-size:16px;font-weight:500">今天可以動的任務</div>
+    <div class="today-date" id="todayDate"></div>
+  </div>
+
+  <div class="focus-bar" id="focusBar">
+    <span class="label">NOW →</span>
+    <div class="focus-chips" id="focusChips"></div>
+  </div>
+
+  <div class="today-go">
+    <div class="section-title"><span style="color:var(--green)">▶ 可以推進</span></div>
+    <div id="todayGoList"></div>
+  </div>
+
+  <div class="today-wait">
+    <div class="section-title"><span>⏸ 等待中</span></div>
+    <div id="todayWaitList"></div>
+  </div>
+</div>
+
+<!-- PROJECTS TAB -->
+<div class="tab-panel" id="tab-projects">
+  <div class="projects-grid" id="projectsGrid"></div>
+</div>
+
+<!-- PROJECT MODAL -->
+<div class="overlay" id="projOverlay">
+  <div class="modal">
+    <h2>NEW PROJECT</h2>
+    <div class="fg">
+      <label class="fl">專案名稱 *</label>
+      <input class="fi" id="pNewName" placeholder="例：後台系統重構" />
+    </div>
+    <div class="fg">
+      <label class="fl">截止日期（選填）</label>
+      <input class="fi" type="date" id="pNewDeadline" />
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeProjModal()">取消</button>
+      <button class="mbtn" onclick="createProject()">建立</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANE MODAL -->
+<div class="overlay" id="laneOverlay">
+  <div class="modal">
+    <h2 id="laneModalTitle">ADD LANE</h2>
+    <div class="fg">
+      <label class="fl">任務線名稱 *</label>
+      <input class="fi" id="lNewName" placeholder="例：API 串接、UI 切版、文件撰寫" />
+    </div>
+    <div class="fg">
+      <label class="fl">狀態</label>
+      <div class="lane-modal-status">
+        <button class="lms-btn sel go" id="lmsGo" onclick="selectLaneStatus('go')">▶ 可推進</button>
+        <button class="lms-btn wait" id="lmsWait" onclick="selectLaneStatus('wait')">⏸ 等待中</button>
+      </div>
+    </div>
+    <div class="fg" id="waitReasonGroup" style="display:none">
+      <label class="fl">等待什麼？（選填）</label>
+      <input class="fi" id="lWaitReason" placeholder="例：等 PM 確認需求、等後端 API" />
+    </div>
+    <div class="fg">
+      <label class="fl">目前進度 / 備注（選填）</label>
+      <input class="fi" id="lDetail" placeholder="做到哪了、下一步..." />
+    </div>
+    <div class="fg">
+      <label class="fl">預估完成（選填）</label>
+      <input class="fi" id="lEta" placeholder="例：2天、下週五" />
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeLaneModal()">取消</button>
+      <button class="mbtn" onclick="saveLane()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'control_v2';
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
+function save() { localStorage.setItem(KEY, JSON.stringify(projects)); }
+
+let projects = load();
+let currentTab = 'today';
+let editingLane = null; // {pid, lid}
+let addingLanePid = null;
+let laneStatus = 'go';
+
+// ── HELPERS ──
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+function timeAgo(iso) {
+  const d = Date.now() - new Date(iso);
+  const m = Math.floor(d/60000);
+  if (m < 1) return '剛剛';
+  if (m < 60) return `${m}分前`;
+  const h = Math.floor(m/60);
+  if (h < 24) return `${h}h前`;
+  return `${Math.floor(h/24)}天前`;
+}
+
+// ── NAV COUNTS ──
+function updateCounts() {
+  let go = 0, wait = 0;
+  projects.forEach(p => p.lanes.forEach(l => { if (l.status === 'go') go++; else wait++; }));
+  document.getElementById('navGo').textContent = `${go} 可推進`;
+  document.getElementById('navWait').textContent = `${wait} 等待中`;
+}
+
+// ── TAB ──
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    const tabs = ['today','projects'];
+    b.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.getElementById('navAddBtn').onclick = tab === 'projects' ? openProjectModal : openProjectModal;
+  renderAll();
+}
+
+// ── RENDER ALL ──
+function renderAll() {
+  save();
+  updateCounts();
+  renderToday();
+  renderProjects();
+}
+
+// ── TODAY ──
+function renderToday() {
+  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+
+  const goList = document.getElementById('todayGoList');
+  const waitList = document.getElementById('todayWaitList');
+  const focusChips = document.getElementById('focusChips');
+
+  goList.innerHTML = '';
+  waitList.innerHTML = '';
+  focusChips.innerHTML = '';
+
+  let anyGo = false, anyWait = false;
+
+  projects.forEach(p => {
+    p.lanes.forEach(l => {
+      const isGo = l.status === 'go';
+      if (isGo) anyGo = true; else anyWait = true;
+
+      const div = document.createElement('div');
+      div.className = `today-lane ${isGo ? '' : 'wait'}`;
+      div.innerHTML = `
+        <div class="tl-project">${esc(p.name)}</div>
+        <div style="flex:1">
+          <div class="tl-name">${esc(l.name)}</div>
+          ${l.detail ? `<div class="tl-detail">${esc(l.detail)}</div>` : ''}
+          ${!isGo && l.waitReason ? `<div class="tl-wait-reason">等：${esc(l.waitReason)}</div>` : ''}
+          ${l.eta ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);margin-top:3px">⏱ ${esc(l.eta)}</div>` : ''}
+        </div>
+        <button class="tl-toggle" onclick="quickToggleLane('${p.id}','${l.id}')">
+          ${isGo ? '→ 等待' : '→ 推進'}
+        </button>
+      `;
+      if (isGo) goList.appendChild(div);
+      else waitList.appendChild(div);
+
+      // focus chips for go lanes
+      if (isGo) {
+        const chip = document.createElement('div');
+        chip.className = 'focus-chip';
+        chip.textContent = `${p.name} › ${l.name}`;
+        chip.title = l.detail || '';
+        focusChips.appendChild(chip);
+      }
+    });
+  });
+
+  if (!anyGo) goList.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">目前沒有可推進的任務線</div>';
+  if (!anyWait) waitList.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">沒有等待中的任務線</div>';
+  if (!anyGo) focusChips.innerHTML = '<span class="focus-empty">沒有可推進的任務</span>';
+}
+
+function quickToggleLane(pid, lid) {
+  const p = projects.find(x => x.id === pid);
+  const l = p.lanes.find(x => x.id === lid);
+  l.status = l.status === 'go' ? 'wait' : 'go';
+  p.updatedAt = new Date().toISOString();
+  renderAll();
+  toast(l.status === 'go' ? '已標記為可推進 ▶' : '已移至等待中 ⏸');
+}
+
+// ── PROJECTS ──
+function renderProjects() {
+  const grid = document.getElementById('projectsGrid');
+  if (projects.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>還沒有專案<br>點右上角「新增專案」開始</p></div>`;
+    return;
+  }
+
+  const openCards = new Set();
+  document.querySelectorAll('.pcard-body.open').forEach(b => openCards.add(b.id.replace('pb-','')));
+
+  grid.innerHTML = '';
+  projects.forEach(p => {
+    const goLanes = p.lanes.filter(l => l.status === 'go');
+    const waitLanes = p.lanes.filter(l => l.status === 'wait');
+    const hasUrgent = p.lanes.length > 0 && goLanes.length === 0;
+
+    const card = document.createElement('div');
+    card.className = `pcard ${hasUrgent && waitLanes.length > 0 ? 'all-waiting' : goLanes.length > 0 ? '' : ''}`;
+    card.id = `pc-${p.id}`;
+
+    const laneHtml = p.lanes.map(l => `
+      <div class="lane-item ${l.status}" id="li-${p.id}-${l.id}">
+        <button class="lane-status-btn" onclick="toggleLane('${p.id}','${l.id}')">
+          ${l.status === 'go' ? '▶ GO' : '⏸ 等待'}
+        </button>
+        <div class="lane-content">
+          <div class="lane-name">${esc(l.name)}</div>
+          ${l.detail ? `<div class="lane-detail">${esc(l.detail)}</div>` : ''}
+          ${l.status === 'wait' && l.waitReason ? `<div class="lane-wait-reason">等：${esc(l.waitReason)}</div>` : ''}
+        </div>
+        ${l.eta ? `<div class="lane-eta">⏱ ${esc(l.eta)}</div>` : ''}
+        <button class="lane-edit-btn" onclick="openEditLane('${p.id}','${l.id}')">✎</button>
+        <button class="icon-btn del" style="width:22px;height:22px;font-size:10px" onclick="deleteLane('${p.id}','${l.id}')">✕</button>
+      </div>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="pcard-head" onclick="toggleCard('${p.id}')">
+        <div style="flex:1">
+          <div class="pname">${esc(p.name)}</div>
+          <div class="pmeta">${goLanes.length} 可推進 · ${waitLanes.length} 等待 · ${timeAgo(p.updatedAt)}</div>
+        </div>
+        <div class="lane-pills">
+          ${goLanes.slice(0,3).map(l => `<span class="lpill go">${esc(l.name)}</span>`).join('')}
+          ${waitLanes.slice(0,2).map(l => `<span class="lpill wait">${esc(l.name)}</span>`).join('')}
+        </div>
+        <button class="icon-btn del" style="margin-left:8px" onclick="deleteProject(event,'${p.id}')">✕</button>
+      </div>
+      <div class="pcard-body ${openCards.has(p.id) ? 'open' : ''}" id="pb-${p.id}">
+        <div class="pcard-inner">
+          <div class="field-block">
+            <div class="flabel">📍 目前進度 / 下一步</div>
+            <textarea class="fld" placeholder="做到哪了？下一步？" oninput="updatePField('${p.id}','progress',this.value)">${esc(p.progress)}</textarea>
+          </div>
+          <div class="field-block">
+            <div class="flabel">⚠️ 待解決問題</div>
+            <textarea class="fld" placeholder="卡住的問題..." oninput="updatePField('${p.id}','issues',this.value)">${esc(p.issues)}</textarea>
+          </div>
+          <div class="field-block">
+            <div class="flabel">💭 思路 / 備忘</div>
+            <textarea class="fld" placeholder="決策原因、注意事項..." oninput="updatePField('${p.id}','thoughts',this.value)">${esc(p.thoughts)}</textarea>
+          </div>
+          <div class="field-block">
+            <div class="flabel">📁 檔案位置</div>
+            <textarea class="fld" placeholder="/Users/you/project/src&#10;一行一個路徑" oninput="updatePField('${p.id}','filePaths',this.value)">${esc(p.filePaths)}</textarea>
+          </div>
+          <div class="field-block full lanes-section">
+            <div class="lanes-header">
+              <div class="flabel">⚡ 任務線</div>
+              <button class="add-btn" style="font-size:10px;padding:5px 12px" onclick="openAddLane('${p.id}')">＋ 新增任務線</button>
+            </div>
+            <div class="lanes-list">
+              ${laneHtml}
+              ${p.lanes.length === 0 ? '<div style="color:var(--muted);font-size:13px;padding:6px 0">還沒有任務線，點上方按鈕新增</div>' : ''}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function toggleCard(pid) {
+  document.getElementById(`pb-${pid}`)?.classList.toggle('open');
+}
+
+function updatePField(pid, field, val) {
+  const p = projects.find(x => x.id === pid);
+  if (!p) return;
+  p[field] = val;
+  p.updatedAt = new Date().toISOString();
+  save();
+  updateCounts();
+}
+
+function toggleLane(pid, lid) {
+  const p = projects.find(x => x.id === pid);
+  const l = p.lanes.find(x => x.id === lid);
+  l.status = l.status === 'go' ? 'wait' : 'go';
+  p.updatedAt = new Date().toISOString();
+  renderAll();
+  document.getElementById(`pb-${pid}`)?.classList.add('open');
+}
+
+function deleteLane(pid, lid) {
+  const p = projects.find(x => x.id === pid);
+  p.lanes = p.lanes.filter(x => x.id !== lid);
+  p.updatedAt = new Date().toISOString();
+  renderAll();
+  document.getElementById(`pb-${pid}`)?.classList.add('open');
+  toast('任務線已刪除');
+}
+
+function deleteProject(e, pid) {
+  e.stopPropagation();
+  if (!confirm('確定刪除這個專案？')) return;
+  projects = projects.filter(x => x.id !== pid);
+  renderAll();
+  toast('已刪除');
+}
+
+// ── PROJECT MODAL ──
+function openProjectModal() {
+  document.getElementById('projOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('pNewName').focus(), 50);
+}
+function closeProjModal() {
+  document.getElementById('projOverlay').classList.remove('open');
+  document.getElementById('pNewName').value = '';
+  document.getElementById('pNewDeadline').value = '';
+}
+function createProject() {
+  const name = document.getElementById('pNewName').value.trim();
+  if (!name) { alert('請輸入專案名稱'); return; }
+  const p = {
+    id: uid(), name,
+    deadline: document.getElementById('pNewDeadline').value,
+    progress: '', issues: '', thoughts: '', filePaths: '',
+    lanes: [],
+    updatedAt: new Date().toISOString(),
+  };
+  projects.unshift(p);
+  renderAll();
+  closeProjModal();
+  switchTab('projects');
+  setTimeout(() => { document.getElementById(`pb-${p.id}`)?.classList.add('open'); }, 100);
+  toast('專案已建立！');
+}
+
+// ── LANE MODAL ──
+function selectLaneStatus(s) {
+  laneStatus = s;
+  document.getElementById('lmsGo').className = `lms-btn go ${s === 'go' ? 'sel' : ''}`;
+  document.getElementById('lmsWait').className = `lms-btn wait ${s === 'wait' ? 'sel' : ''}`;
+  document.getElementById('waitReasonGroup').style.display = s === 'wait' ? 'block' : 'none';
+}
+
+function openAddLane(pid) {
+  addingLanePid = pid; editingLane = null;
+  document.getElementById('laneModalTitle').textContent = 'ADD LANE';
+  document.getElementById('lNewName').value = '';
+  document.getElementById('lDetail').value = '';
+  document.getElementById('lWaitReason').value = '';
+  document.getElementById('lEta').value = '';
+  selectLaneStatus('go');
+  document.getElementById('laneOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('lNewName').focus(), 50);
+}
+
+function openEditLane(pid, lid) {
+  const p = projects.find(x => x.id === pid);
+  const l = p.lanes.find(x => x.id === lid);
+  editingLane = { pid, lid }; addingLanePid = null;
+  document.getElementById('laneModalTitle').textContent = 'EDIT LANE';
+  document.getElementById('lNewName').value = l.name;
+  document.getElementById('lDetail').value = l.detail || '';
+  document.getElementById('lWaitReason').value = l.waitReason || '';
+  document.getElementById('lEta').value = l.eta || '';
+  selectLaneStatus(l.status);
+  document.getElementById('laneOverlay').classList.add('open');
+}
+
+function closeLaneModal() {
+  document.getElementById('laneOverlay').classList.remove('open');
+  editingLane = null; addingLanePid = null;
+}
+
+function saveLane() {
+  const name = document.getElementById('lNewName').value.trim();
+  if (!name) { alert('請輸入任務線名稱'); return; }
+  const data = {
+    name,
+    status: laneStatus,
+    detail: document.getElementById('lDetail').value.trim(),
+    waitReason: document.getElementById('lWaitReason').value.trim(),
+    eta: document.getElementById('lEta').value.trim(),
+  };
+  if (editingLane) {
+    const p = projects.find(x => x.id === editingLane.pid);
+    const l = p.lanes.find(x => x.id === editingLane.lid);
+    Object.assign(l, data);
+    p.updatedAt = new Date().toISOString();
+    renderAll();
+    document.getElementById(`pb-${editingLane.pid}`)?.classList.add('open');
+  } else {
+    const p = projects.find(x => x.id === addingLanePid);
+    p.lanes.push({ id: uid(), ...data });
+    p.updatedAt = new Date().toISOString();
+    renderAll();
+    document.getElementById(`pb-${addingLanePid}`)?.classList.add('open');
+  }
+  closeLaneModal();
+  toast('已儲存');
+}
+
+// close overlays on outside click
+['projOverlay','laneOverlay'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target.id === id) {
+      if (id === 'projOverlay') closeProjModal();
+      else closeLaneModal();
+    }
+  });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeProjModal(); closeLaneModal(); }
+});
+
+renderAll();
+</script>
+</body>
+</html>
