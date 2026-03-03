@@ -40,7 +40,7 @@ nav {
 }
 .logo {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
+  font-size: 20px;
   font-weight: 600;
   color: var(--amber);
   letter-spacing: 3px;
@@ -51,7 +51,7 @@ nav {
   background: none; border: none;
   color: var(--muted);
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
+  font-size: 19px;
   letter-spacing: 1px;
   padding: 0 18px;
   height: 52px;
@@ -66,7 +66,7 @@ nav {
 
 .pill {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
+  font-size: 18px;
   padding: 3px 10px;
   border: 1px solid var(--border);
   color: var(--muted);
@@ -79,7 +79,7 @@ nav {
   color: #fff;
   border: none;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
+  font-size: 19px;
   font-weight: 600;
   padding: 7px 16px;
   cursor: pointer;
@@ -106,7 +106,7 @@ nav {
 }
 .focus-bar .label {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
+  font-size: 18px;
   color: var(--green);
   letter-spacing: 2px;
   white-space: nowrap;
@@ -116,13 +116,13 @@ nav {
   background: var(--s3);
   border: 1px solid var(--green);
   color: var(--green);
-  font-size: 12px;
+  font-size: 20px;
   padding: 4px 12px;
   cursor: pointer;
   transition: all 0.15s;
 }
 .focus-chip:hover { background: #1e2e1e; }
-.focus-empty { font-size: 12px; color: var(--muted); font-style: italic; }
+.focus-empty { font-size: 20px; color: var(--muted); font-style: italic; }
 
 /* ── PROJECT CARDS ── */
 .projects-grid { display: flex; flex-direction: column; gap: 14px; }
@@ -145,12 +145,12 @@ nav {
 }
 .pcard-head:hover .pname { color: var(--amber); }
 
-.pname { font-size: 15px; font-weight: 500; transition: color 0.15s; }
-.pmeta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 3px; }
+.pname { font-size: 19px; font-weight: 500; transition: color 0.15s; }
+.pmeta { font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: var(--muted); margin-top: 3px; }
 
 .lane-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
 .lpill {
-  font-size: 10px;
+  font-size: 18px;
   font-family: 'IBM Plex Mono', monospace;
   padding: 2px 9px;
   border: 1px solid;
@@ -163,7 +163,7 @@ nav {
   background: none; border: 1px solid var(--border);
   color: var(--muted);
   width: 26px; height: 26px;
-  cursor: pointer; font-size: 12px;
+  cursor: pointer; font-size: 20px;
   display: flex; align-items: center; justify-content: center;
   transition: all 0.15s; flex-shrink: 0;
 }
@@ -182,7 +182,7 @@ nav {
 
 .flabel {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
+  font-size: 18px;
   color: var(--muted);
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -193,7 +193,7 @@ textarea.fld, input.fld {
   border: 1px solid var(--border);
   color: var(--text);
   font-family: 'Noto Sans TC', sans-serif;
-  font-size: 13px;
+  font-size: 17px;
   padding: 9px 11px;
   resize: vertical;
   line-height: 1.7;
@@ -230,7 +230,7 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
   background: none; border: 1px solid var(--dim);
   color: var(--dim);
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px;
+  font-size: 17px;
   padding: 3px 8px;
   cursor: pointer;
   white-space: nowrap;
@@ -244,23 +244,23 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
 .lane-status-btn:hover { opacity: 0.7; }
 
 .lane-content { flex: 1; }
-.lane-name { font-size: 13px; font-weight: 500; }
+.lane-name { font-size: 17px; font-weight: 500; }
 .lane-detail {
-  font-size: 12px;
+  font-size: 20px;
   color: var(--muted);
   margin-top: 3px;
   line-height: 1.5;
 }
 .lane-wait-reason {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
+  font-size: 18px;
   color: var(--amber);
   margin-top: 4px;
 }
 
 .lane-eta {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
+  font-size: 18px;
   color: var(--dim);
   white-space: nowrap;
   flex-shrink: 0;
@@ -268,7 +268,7 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
 
 .lane-edit-btn {
   background: none; border: none;
-  color: var(--dim); cursor: pointer; font-size: 13px;
+  color: var(--dim); cursor: pointer; font-size: 17px;
   padding: 2px 4px; flex-shrink: 0;
   transition: color 0.15s;
 }
@@ -285,7 +285,7 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
   background: none; border: none;
   color: var(--text);
   font-family: 'Noto Sans TC', sans-serif;
-  font-size: 13px;
+  font-size: 17px;
   flex: 1;
 }
 .add-lane-row input:focus, .add-lane-row select:focus { outline: none; }
@@ -299,12 +299,12 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
 }
 .today-date {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
+  font-size: 19px;
   color: var(--muted);
 }
 .section-title {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
+  font-size: 19px;
   color: var(--muted);
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -334,20 +334,20 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
 
 .tl-project {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
+  font-size: 18px;
   color: var(--muted);
   white-space: nowrap;
   padding-top: 2px;
   min-width: 100px;
 }
-.tl-name { font-size: 14px; font-weight: 500; }
-.tl-detail { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
-.tl-wait-reason { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--amber); margin-top: 4px; }
+.tl-name { font-size: 18px; font-weight: 500; }
+.tl-detail { font-size: 20px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+.tl-wait-reason { font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: var(--amber); margin-top: 4px; }
 
 .tl-toggle {
   margin-left: auto;
   background: none; border: 1px solid var(--border);
-  color: var(--dim); cursor: pointer; font-size: 10px;
+  color: var(--dim); cursor: pointer; font-size: 18px;
   font-family: 'IBM Plex Mono', monospace;
   padding: 3px 9px; white-space: nowrap;
   transition: all 0.15s; flex-shrink: 0;
@@ -376,22 +376,22 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
 }
 .modal h2 {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px; letter-spacing: 3px; color: var(--amber);
+  font-size: 20px; letter-spacing: 3px; color: var(--amber);
   margin-bottom: 18px;
 }
 .fg { margin-bottom: 13px; }
-.fl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); display: block; margin-bottom: 5px; letter-spacing: 1px; }
+.fl { font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: var(--muted); display: block; margin-bottom: 5px; letter-spacing: 1px; }
 .fi {
   width: 100%; background: var(--s2); border: 1px solid var(--border);
   color: var(--text); font-family: 'Noto Sans TC', sans-serif;
-  font-size: 13px; padding: 9px 11px;
+  font-size: 17px; padding: 9px 11px;
 }
 .fi:focus { outline: none; border-color: var(--blue); }
 .modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
 .mbtn {
   background: var(--amber); color: #fff;
   border: none; font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px; font-weight: 600; padding: 9px 22px; cursor: pointer;
+  font-size: 19px; font-weight: 600; padding: 9px 22px; cursor: pointer;
   transition: all 0.15s;
 }
 .mbtn:hover { background: #f5cd6a; }
@@ -407,7 +407,7 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
 .lms-btn {
   flex: 1; padding: 8px; text-align: center;
   border: 1px solid var(--border); cursor: pointer;
-  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 19px;
   background: none; color: var(--muted);
   transition: all 0.15s;
 }
@@ -419,7 +419,7 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
   position: fixed; bottom: 20px; right: 20px;
   background: var(--s3); border: 1px solid var(--border);
   color: var(--text); font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px; padding: 9px 16px; z-index: 300;
+  font-size: 19px; padding: 9px 16px; z-index: 300;
   opacity: 0; transition: opacity 0.25s; pointer-events: none;
 }
 .toast.show { opacity: 1; }
@@ -427,8 +427,8 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
 .empty-state {
   text-align: center; padding: 50px 20px; color: var(--muted);
 }
-.empty-state .icon { font-size: 32px; margin-bottom: 10px; }
-.empty-state p { font-size: 13px; line-height: 1.9; }
+.empty-state .icon { font-size: 36px; margin-bottom: 10px; }
+.empty-state p { font-size: 17px; line-height: 1.9; }
 </style>
 </head>
 <body>
@@ -447,7 +447,7 @@ textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
 <!-- TODAY TAB -->
 <div class="tab-panel active" id="tab-today">
   <div class="today-header">
-    <div style="font-size:16px;font-weight:500">今天可以動的任務</div>
+    <div style="font-size:20px;font-weight:500">今天可以動的任務</div>
     <div class="today-date" id="todayDate"></div>
   </div>
 
@@ -615,7 +615,7 @@ function renderToday() {
           <div class="tl-name">${esc(l.name)}</div>
           ${l.detail ? `<div class="tl-detail">${esc(l.detail)}</div>` : ''}
           ${!isGo && l.waitReason ? `<div class="tl-wait-reason">等：${esc(l.waitReason)}</div>` : ''}
-          ${l.eta ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);margin-top:3px">⏱ ${esc(l.eta)}</div>` : ''}
+          ${l.eta ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--dim);margin-top:3px">⏱ ${esc(l.eta)}</div>` : ''}
         </div>
         <button class="tl-toggle" onclick="quickToggleLane('${p.id}','${l.id}')">
           ${isGo ? '→ 等待' : '→ 推進'}
@@ -635,8 +635,8 @@ function renderToday() {
     });
   });
 
-  if (!anyGo) goList.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">目前沒有可推進的任務線</div>';
-  if (!anyWait) waitList.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">沒有等待中的任務線</div>';
+  if (!anyGo) goList.innerHTML = '<div style="color:var(--muted);font-size:17px;padding:8px 0">目前沒有可推進的任務線</div>';
+  if (!anyWait) waitList.innerHTML = '<div style="color:var(--muted);font-size:17px;padding:8px 0">沒有等待中的任務線</div>';
   if (!anyGo) focusChips.innerHTML = '<span class="focus-empty">沒有可推進的任務</span>';
 }
 
@@ -682,7 +682,7 @@ function renderProjects() {
         </div>
         ${l.eta ? `<div class="lane-eta">⏱ ${esc(l.eta)}</div>` : ''}
         <button class="lane-edit-btn" onclick="openEditLane('${p.id}','${l.id}')">✎</button>
-        <button class="icon-btn del" style="width:22px;height:22px;font-size:10px" onclick="deleteLane('${p.id}','${l.id}')">✕</button>
+        <button class="icon-btn del" style="width:22px;height:22px;font-size:14px" onclick="deleteLane('${p.id}','${l.id}')">✕</button>
       </div>
     `).join('');
 
@@ -719,11 +719,11 @@ function renderProjects() {
           <div class="field-block full lanes-section">
             <div class="lanes-header">
               <div class="flabel">⚡ 任務線</div>
-              <button class="add-btn" style="font-size:10px;padding:5px 12px" onclick="openAddLane('${p.id}')">＋ 新增任務線</button>
+              <button class="add-btn" style="font-size:14px;padding:5px 12px" onclick="openAddLane('${p.id}')">＋ 新增任務線</button>
             </div>
             <div class="lanes-list">
               ${laneHtml}
-              ${p.lanes.length === 0 ? '<div style="color:var(--muted);font-size:13px;padding:6px 0">還沒有任務線，點上方按鈕新增</div>' : ''}
+              ${p.lanes.length === 0 ? '<div style="color:var(--muted);font-size:17px;padding:6px 0">還沒有任務線，點上方按鈕新增</div>' : ''}
             </div>
           </div>
         </div>
