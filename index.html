@@ -94,6 +94,7 @@ label{font-size:12px;color:var(--text2);font-weight:600;display:block;margin-bot
 .line-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0}
 .line-pack{background:rgba(160,128,240,.15);color:var(--purple)}
 .line-exhibit{background:rgba(45,232,176,.1);color:var(--teal)}
+.line-stall{background:rgba(196,122,0,.12);color:var(--amber)}
 .line-other{background:rgba(96,168,240,.1);color:var(--blue)}
 
 /* Status select */
@@ -207,8 +208,17 @@ function defDB(){
       {id:'w5p1',week:5,line:'pack',text:'禮盒設計（若做）',status:'upcoming',note:'',blockedBy:['w4p1']},
       {id:'w6p1',week:6,line:'pack',text:'全部定稿，送印',status:'upcoming',note:'',blockedBy:['w5p1']},
       {id:'w7p1',week:7,line:'pack',text:'收件確認印刷品質',status:'upcoming',note:'',blockedBy:['w6p1']},
-      // 畢展線
-      {id:'w1e1',week:1,line:'exhibit',text:'問老師海報/邀卡要加什麼（本週最重要）',status:'current',note:'這個不解決整條印刷線卡死'},
+      // 擺攤線
+      {id:'s1a',week:1,line:'stall',text:'確定攤位品牌概念（名稱/主色/調性）',status:'upcoming',note:'',blockedBy:[]},
+      {id:'s2a',week:2,line:'stall',text:'攤位平面配置草圖（動線/擺設）',status:'upcoming',note:'',blockedBy:['s1a']},
+      {id:'s2b',week:2,line:'stall',text:'宣傳影片腳本完成',status:'upcoming',note:'',blockedBy:['s1a']},
+      {id:'s3a',week:3,line:'stall',text:'影片拍攝（協作組員）',status:'upcoming',note:'',blockedBy:['s2b']},
+      {id:'s3b',week:3,line:'stall',text:'道具／器材清單確認＋採購',status:'upcoming',note:'',blockedBy:['s2a']},
+      {id:'s4a',week:4,line:'stall',text:'影片剪輯輸出',status:'upcoming',note:'',blockedBy:['s3a']},
+      {id:'s4b',week:4,line:'stall',text:'攤位視覺設計（banner/標牌）',status:'upcoming',note:'',blockedBy:['s2a']},
+      {id:'s5a',week:5,line:'stall',text:'攤位道具製作／到位確認',status:'upcoming',note:'',blockedBy:['s3b','s4b']},
+      {id:'s6a',week:6,line:'stall',text:'影片上傳測試、播放設備確認',status:'upcoming',note:'',blockedBy:['s4a']},
+      {id:'s7a',week:7,line:'stall',text:'現場布置演練',status:'upcoming',note:'',blockedBy:['s5a','s6a']},text:'問老師海報/邀卡要加什麼（本週最重要）',status:'current',note:'這個不解決整條印刷線卡死'},
       {id:'w2e1',week:2,line:'exhibit',text:'海報/邀卡定稿',status:'upcoming',note:'',blockedBy:['w1e1']},
       {id:'w3e1',week:3,line:'exhibit',text:'發包印刷',status:'upcoming',note:'',blockedBy:['w2e1']},
       {id:'w3e2',week:3,line:'exhibit',text:'開始場地規劃（動線/攤位）',status:'upcoming',note:''},
@@ -225,6 +235,8 @@ function defDB(){
     memos: [],
     // 待決策
     decisions: [],
+    // 其他作業
+    assignments: [],
   };
 }
 
@@ -284,7 +296,7 @@ function statusLabel(s){
   return {done:'✅ 完成',current:'🔥 進行中',blocked:'🔒 被擋住',upcoming:'⬜ 待辦'}[s]||s;
 }
 function lineName(l){
-  return {pack:'📦 包裝',exhibit:'🎨 畢展',other:'📌 其他'}[l]||l;
+  return {pack:'📦 包裝',exhibit:'🎨 畢展',stall:'🍵 擺攤',other:'📌 其他'}[l]||l;
 }
 
 // ═══════════════════════════════
@@ -294,6 +306,8 @@ const NAV = [
   {id:'today',icon:'◈',label:'TODAY'},
   {id:'pack',icon:'📦',label:'包裝線'},
   {id:'exhibit',icon:'🎨',label:'畢展線'},
+  {id:'stall',icon:'🍵',label:'擺攤線'},
+  {id:'assignments',icon:'📚',label:'其他作業'},
   {id:'feedback',icon:'💬',label:'老師回饋'},
   {id:'vendor',icon:'🏭',label:'廠商'},
   {id:'memo',icon:'📝',label:'隨手記'},
@@ -318,16 +332,18 @@ function renderAll(){ renderNav(); renderPage(); }
 function renderPage(){
   const t = document.getElementById('topbarTitle');
   const el = document.getElementById('pageContent');
-  const titles = {today:'TODAY',pack:'📦 包裝線',exhibit:'🎨 畢展線',feedback:'💬 老師回饋',vendor:'🏭 廠商資料',memo:'📝 隨手記',settings:'⚙ 設定'};
+  const titles = {today:'TODAY',pack:'📦 包裝線',exhibit:'🎨 畢展線',stall:'🍵 擺攤線',assignments:'📚 其他作業',feedback:'💬 老師回饋',vendor:'🏭 廠商資料',memo:'📝 隨手記',settings:'⚙ 設定'};
   if(t) t.textContent = titles[activeTab]||'畢製追蹤';
   switch(activeTab){
-    case 'today':    el.innerHTML = pageToday(); break;
-    case 'pack':     el.innerHTML = pageLine('pack'); break;
-    case 'exhibit':  el.innerHTML = pageLine('exhibit'); break;
-    case 'feedback': el.innerHTML = pageFeedback(); break;
-    case 'vendor':   el.innerHTML = pageVendor(); break;
-    case 'memo':     el.innerHTML = pageMemo(); break;
-    case 'settings': el.innerHTML = pageSettings(); break;
+    case 'today':       el.innerHTML = pageToday(); break;
+    case 'pack':        el.innerHTML = pageLine('pack'); break;
+    case 'exhibit':     el.innerHTML = pageLine('exhibit'); break;
+    case 'stall':       el.innerHTML = pageLine('stall'); break;
+    case 'assignments': el.innerHTML = pageAssignments(); break;
+    case 'feedback':    el.innerHTML = pageFeedback(); break;
+    case 'vendor':      el.innerHTML = pageVendor(); break;
+    case 'memo':        el.innerHTML = pageMemo(); break;
+    case 'settings':    el.innerHTML = pageSettings(); break;
   }
 }
 
@@ -337,8 +353,7 @@ function pageToday(){
   const unlockedTasks = db.weekPlans.filter(t=>t.status==='upcoming'&&isUnlocked(t));
   const blockedTasks = db.weekPlans.filter(t=>t.status==='upcoming'&&!isUnlocked(t));
   const wLeft5_10 = weeksLeft('2025-05-10');
-  const wLeft5_23 = weeksLeft('2025-05-23');
-  const doneCount = db.weekPlans.filter(t=>t.status==='done').length;
+  const wLeft5_23 = weeksLeft('2025-05-23');  const doneCount = db.weekPlans.filter(t=>t.status==='done').length;
   const total = db.weekPlans.length;
 
   // current week tasks
@@ -353,7 +368,7 @@ function pageToday(){
         <div style="font-size:10px;color:var(--text3)">5/10</div>
       </div>
       <div class="card" style="flex:1;min-width:120px;border-color:rgba(45,232,176,.2)">
-        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">畢展</div>
+        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">畢展＋擺攤</div>
         <div style="font-size:20px;font-weight:700;color:var(--teal);font-family:'DM Mono',monospace">${wLeft5_23}週</div>
         <div style="font-size:10px;color:var(--text3)">5/23</div>
       </div>
@@ -433,7 +448,7 @@ function pageLine(line){
     <button class="btn btn-amber btn-sm" onclick="openAddTask('${line}')">＋ 新增任務</button>
   </div>
   <div style="height:4px;background:var(--bg3);border-radius:2px;margin-bottom:20px">
-    <div style="height:4px;background:var(--${line==='pack'?'amber':'teal'});border-radius:2px;width:${tasks.length?Math.round(done/tasks.length*100):0}%;transition:width .3s"></div>
+    <div style="height:4px;background:var(--${line==='pack'?'amber':line==='stall'?'amber':'teal'});border-radius:2px;width:${tasks.length?Math.round(done/tasks.length*100):0}%;transition:width .3s"></div>
   </div>
   ${weeks.map(w=>{
     const wtasks = tasks.filter(t=>t.week===w);
@@ -461,6 +476,125 @@ function pageLine(line){
     </div>`;
   }).join('')}`;
 }
+
+// ─── ASSIGNMENTS ───
+function pageAssignments(){
+  const list = db.assignments||[];
+  const pending = list.filter(a=>!a.done);
+  const done = list.filter(a=>a.done);
+  return `
+  <div class="page-header">
+    <div><div class="page-title">其他作業</div>
+    <div class="page-sub mono">${pending.length} 件待完成</div></div>
+    <button class="btn btn-amber btn-sm" onclick="openAddAssignment()">＋ 新增作業</button>
+  </div>
+  ${pending.map(a=>renderAssignmentCard(a)).join('')}
+  ${done.length?`
+    <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:2px;margin:16px 0 8px">✅ 已完成 (${done.length})</div>
+    ${done.map(a=>renderAssignmentCard(a)).join('')}
+  `:''}
+  ${!list.length?'<div style="color:var(--text3);font-size:13px;padding:20px">還沒有作業，按右上角新增</div>':''}`;
+}
+
+function renderAssignmentCard(a){
+  const daysLeft = a.deadline ? Math.ceil((new Date(a.deadline)-new Date(TODAY))/(86400000)) : null;
+  const urgent = daysLeft!==null && daysLeft<=3 && !a.done;
+  const tasks = a.tasks||[];
+  const mats = a.materials||[];
+  const doneCount = tasks.filter(t=>t.done).length;
+  return `
+  <div class="card" style="margin-bottom:10px;${a.done?'opacity:.45':''}${urgent?';border-color:var(--rose)':''}">
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:${tasks.length||mats.length||a.plan?'10':'0'}px">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px">${esc(a.name)}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(a.course||'')}${a.deadline?` · 截止 ${a.deadline}`:''}${daysLeft!==null&&!a.done?` <span style="color:${urgent?'var(--rose)':'var(--text3)'}">(${daysLeft>0?daysLeft+'天後':daysLeft===0?'今天':'已過期'})</span>`:''}</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        ${!a.done?`<button class="btn btn-teal btn-sm" onclick="doneAssignment('${a.id}')">✓</button>`:`<button class="btn btn-ghost btn-sm" onclick="undoAssignment('${a.id}')">↩</button>`}
+        <button class="btn btn-ghost btn-sm" onclick="openEditAssignment('${a.id}')">編輯</button>
+        <button class="btn btn-ghost btn-sm" onclick="deleteAssignment('${a.id}')">✕</button>
+      </div>
+    </div>
+    ${tasks.length?`
+    <div style="margin-bottom:8px">
+      <div style="font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:4px">子任務 ${doneCount}/${tasks.length}</div>
+      ${tasks.map(t=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
+          <input type="checkbox" ${t.done?'checked':''} onchange="toggleSubtask('${a.id}','${t.id}',this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal);flex-shrink:0">
+          <span style="font-size:13px;${t.done?'text-decoration:line-through;color:var(--text3)':''}">${esc(t.text)}</span>
+        </div>`).join('')}
+    </div>`:''}
+    ${mats.length?`
+    <div style="margin-bottom:8px">
+      <div style="font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:4px">材料</div>
+      ${mats.map(m=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
+          <input type="checkbox" ${m.done?'checked':''} onchange="toggleMaterial('${a.id}','${m.id}',this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--purple);flex-shrink:0">
+          <span style="font-size:12px;color:var(--text2);${m.done?'text-decoration:line-through;color:var(--text3)':''}">${esc(m.text)}</span>
+        </div>`).join('')}
+    </div>`:''}
+    ${a.plan?`<div style="font-size:12px;color:var(--text2);padding:6px 8px;background:var(--bg3);border-radius:4px;white-space:pre-wrap">${esc(a.plan)}</div>`:''}
+  </div>`;
+}
+
+function openAddAssignment(){
+  showModal(`
+    <div class="modal-title">新增作業</div>
+    <div class="fg"><label>作業名稱</label><input type="text" id="aName" placeholder="例：品牌識別設計"></div>
+    <div class="fg"><label>課名</label><input type="text" id="aCourse" placeholder="例：視覺傳達設計"></div>
+    <div class="fg"><label>截止日</label><input type="date" id="aDeadline"></div>
+    <div class="fg"><label>子任務（每行一項）</label><textarea id="aTasks" placeholder="草稿&#10;正稿&#10;輸出"></textarea></div>
+    <div class="fg"><label>材料清單（每行一項）</label><textarea id="aMats" placeholder="A3 紙&#10;黑色代針筆"></textarea></div>
+    <div class="fg"><label>製作計畫 / 備注</label><textarea id="aPlan" placeholder="時程安排或其他備注..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-amber" onclick="saveNewAssignment()">新增</button>
+    </div>`);
+}
+
+function saveNewAssignment(){
+  const name = document.getElementById('aName').value.trim();
+  if(!name){toast('請填作業名稱');return;}
+  const tasks = document.getElementById('aTasks').value.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>({id:uid(),text:s,done:false}));
+  const mats = document.getElementById('aMats').value.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>({id:uid(),text:s,done:false}));
+  if(!db.assignments) db.assignments=[];
+  db.assignments.push({id:uid(),name,course:document.getElementById('aCourse').value.trim(),deadline:document.getElementById('aDeadline').value,tasks,materials:mats,plan:document.getElementById('aPlan').value.trim(),done:false});
+  save();closeModal();renderPage();toast('✓ 已新增');
+}
+
+function openEditAssignment(id){
+  const a=(db.assignments||[]).find(x=>x.id===id);if(!a)return;
+  showModal(`
+    <div class="modal-title">編輯作業</div>
+    <div class="fg"><label>作業名稱</label><input type="text" id="aName" value="${esc(a.name)}"></div>
+    <div class="fg"><label>課名</label><input type="text" id="aCourse" value="${esc(a.course||'')}"></div>
+    <div class="fg"><label>截止日</label><input type="date" id="aDeadline" value="${esc(a.deadline||'')}"></div>
+    <div class="fg"><label>子任務（每行一項）</label><textarea id="aTasks">${esc((a.tasks||[]).map(t=>t.text).join('\n'))}</textarea></div>
+    <div class="fg"><label>材料清單（每行一項）</label><textarea id="aMats">${esc((a.materials||[]).map(m=>m.text).join('\n'))}</textarea></div>
+    <div class="fg"><label>製作計畫 / 備注</label><textarea id="aPlan">${esc(a.plan||'')}</textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-amber" onclick="saveEditAssignment('${id}')">儲存</button>
+    </div>`);
+}
+
+function saveEditAssignment(id){
+  const a=(db.assignments||[]).find(x=>x.id===id);if(!a)return;
+  const name=document.getElementById('aName').value.trim();
+  if(!name){toast('請填作業名稱');return;}
+  const newTaskTexts=document.getElementById('aTasks').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  a.tasks=newTaskTexts.map(text=>{const ex=(a.tasks||[]).find(t=>t.text===text);return ex||{id:uid(),text,done:false};});
+  const newMatTexts=document.getElementById('aMats').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  a.materials=newMatTexts.map(text=>{const ex=(a.materials||[]).find(m=>m.text===text);return ex||{id:uid(),text,done:false};});
+  a.name=name;a.course=document.getElementById('aCourse').value.trim();a.deadline=document.getElementById('aDeadline').value;a.plan=document.getElementById('aPlan').value.trim();
+  save();closeModal();renderPage();toast('✓ 已儲存');
+}
+
+function toggleSubtask(aid,tid,checked){const a=(db.assignments||[]).find(x=>x.id===aid);if(!a)return;const t=(a.tasks||[]).find(x=>x.id===tid);if(!t)return;t.done=checked;save();}
+function toggleMaterial(aid,mid,checked){const a=(db.assignments||[]).find(x=>x.id===aid);if(!a)return;const m=(a.materials||[]).find(x=>x.id===mid);if(!m)return;m.done=checked;save();}
+function doneAssignment(id){const a=(db.assignments||[]).find(x=>x.id===id);if(!a)return;a.done=true;save();renderPage();toast('✅ 完成！');}
+function undoAssignment(id){const a=(db.assignments||[]).find(x=>x.id===id);if(!a)return;a.done=false;save();renderPage();}
+function deleteAssignment(id){if(!confirm('刪除這個作業？'))return;db.assignments=(db.assignments||[]).filter(x=>x.id!==id);save();renderPage();toast('已刪除');}
 
 // ─── FEEDBACK ───
 function pageFeedback(){
