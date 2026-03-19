@@ -125,28 +125,36 @@ label{font-size:12px;color:var(--text2);font-weight:600;display:block;margin-bot
   .sidebar{width:100%;height:56px;flex-direction:row;justify-content:space-around;position:fixed;bottom:0;left:0;right:0;z-index:50;border-top:1px solid var(--border);border-right:none;border-bottom:none;padding:0 4px;gap:0}
   .sib{width:44px;height:44px;border-radius:10px;font-size:18px}
   .main{padding-bottom:56px;height:100vh}
-  .page{padding:14px 12px;font-size:15px}
-  .page-header{margin-bottom:14px}
+  .page{padding:16px 14px;font-size:15px}
+  .page-header{margin-bottom:16px}
   .page-title{font-size:17px}
   .topbar{height:44px;padding:0 14px}
   .topbar-title{font-size:15px}
   .overlay{align-items:flex-end;padding:0}
-  .modal{border-radius:16px 16px 0 0;max-width:100%;max-height:92vh;padding:18px 16px}
-  .modal-title{font-size:16px}
-  .focus-card{padding:14px}
+  .modal{border-radius:16px 16px 0 0;max-width:100%;max-height:92vh;padding:20px 16px}
+  .modal-title{font-size:16px;margin-bottom:18px}
+  .focus-card{padding:14px;margin-bottom:10px!important}
   .focus-text{font-size:15px}
-  .card{padding:12px}
-  .week-task-row{padding:10px 10px;gap:8px}
-  .week-task-text{font-size:13px}
-  .memo-text{font-size:14px}
-  .memo-row{padding:12px}
-  .line-badge{font-size:11px;padding:3px 9px}
+  /* 卡片間距加大 */
+  .card{padding:14px;margin-bottom:10px}
+  /* 任務列：文字換行，按鈕縮到右邊 */
+  .week-task-row{padding:12px 10px;gap:8px;flex-wrap:wrap;align-items:flex-start}
+  .week-task-text{font-size:14px;flex:1;min-width:0;line-height:1.4}
+  .memo-text{font-size:14px;line-height:1.6}
+  .memo-row{padding:14px;margin-bottom:8px}
+  .line-badge{font-size:11px;padding:3px 9px;flex-shrink:0}
   input,select,textarea{font-size:16px !important}
-  .btn-sm{padding:6px 12px;font-size:12px}
+  /* 按鈕手機加大點擊區 */
+  .btn-sm{padding:7px 13px;font-size:12px}
+  .btn{padding:9px 16px}
   .status-sel{gap:6px}
-  .status-opt{padding:6px 12px;font-size:12px}
-  .modal-footer{gap:8px}
-  .modal-footer button{padding:10px 16px;font-size:13px}
+  .status-opt{padding:7px 13px;font-size:12px}
+  .modal-footer{gap:8px;margin-top:20px}
+  .modal-footer button{padding:11px 16px;font-size:13px;flex:1}
+  /* week-task-row 的按鈕群不要被擠掉 */
+  .week-task-row > div[onclick]{flex-shrink:0}
+  /* 任務樹子項縮排小一點 */
+  .task-children{padding-left:8px}
 }
 @media(min-width:641px) and (max-width:900px){
   .sidebar{width:44px}
@@ -162,6 +170,7 @@ label{font-size:12px;color:var(--text2);font-weight:600;display:block;margin-bot
     <div class="topbar">
       <div class="topbar-title" id="topbarTitle">畢製追蹤</div>
       <div class="mono" style="font-size:11px;color:var(--text3)" id="topbarDate"></div>
+      <button class="btn btn-sm btn-ghost" onclick="openWeeklyReport()" title="產生週報給 Claude">📋</button>
       <button class="btn btn-sm" onclick="manualSave()">💾</button>
     </div>
     <div class="page" id="pageContent"></div>
@@ -218,7 +227,9 @@ function defDB(){
       {id:'s4b',week:4,line:'stall',text:'攤位視覺設計（banner/標牌）',status:'upcoming',note:'',blockedBy:['s2a']},
       {id:'s5a',week:5,line:'stall',text:'攤位道具製作／到位確認',status:'upcoming',note:'',blockedBy:['s3b','s4b']},
       {id:'s6a',week:6,line:'stall',text:'影片上傳測試、播放設備確認',status:'upcoming',note:'',blockedBy:['s4a']},
-      {id:'s7a',week:7,line:'stall',text:'現場布置演練',status:'upcoming',note:'',blockedBy:['s5a','s6a']},text:'問老師海報/邀卡要加什麼（本週最重要）',status:'current',note:'這個不解決整條印刷線卡死'},
+      {id:'s7a',week:7,line:'stall',text:'現場布置演練',status:'upcoming',note:'',blockedBy:['s5a','s6a']},
+      // 畢展線
+      {id:'w1e1',week:1,line:'exhibit',text:'問老師海報/邀卡要加什麼（本週最重要）',status:'current',note:'這個不解決整條印刷線卡死'},
       {id:'w2e1',week:2,line:'exhibit',text:'海報/邀卡定稿',status:'upcoming',note:'',blockedBy:['w1e1']},
       {id:'w3e1',week:3,line:'exhibit',text:'發包印刷',status:'upcoming',note:'',blockedBy:['w2e1']},
       {id:'w3e2',week:3,line:'exhibit',text:'開始場地規劃（動線/攤位）',status:'upcoming',note:''},
@@ -362,17 +373,17 @@ function pageToday(){
   return `
   <div style="margin-bottom:20px">
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
-      <div class="card" style="flex:1;min-width:120px;border-color:rgba(240,184,64,.3)">
+      <div class="card" style="flex:1;min-width:140px;border-color:rgba(240,184,64,.3)">
         <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">包裝截止</div>
         <div style="font-size:20px;font-weight:700;color:var(--amber);font-family:'DM Mono',monospace">${wLeft5_10}週</div>
         <div style="font-size:10px;color:var(--text3)">5/10</div>
       </div>
-      <div class="card" style="flex:1;min-width:120px;border-color:rgba(45,232,176,.2)">
+      <div class="card" style="flex:1;min-width:140px;border-color:rgba(45,232,176,.2)">
         <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">畢展＋擺攤</div>
         <div style="font-size:20px;font-weight:700;color:var(--teal);font-family:'DM Mono',monospace">${wLeft5_23}週</div>
         <div style="font-size:10px;color:var(--text3)">5/23</div>
       </div>
-      <div class="card" style="flex:1;min-width:120px">
+      <div class="card" style="flex:1;min-width:140px">
         <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">進度</div>
         <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace">${doneCount}/${total}</div>
         <div style="height:4px;background:var(--bg3);border-radius:2px;margin-top:6px"><div style="height:4px;background:var(--teal);border-radius:2px;width:${Math.round(doneCount/total*100)}%"></div></div>
@@ -884,6 +895,147 @@ function saveDecision(){
 }
 function resolveDecision(id){ const d=db.decisions.find(x=>x.id===id);if(d){d.resolved=true;save();renderPage();toast('✓ 決策完成');} }
 function deleteDecision(id){ db.decisions=db.decisions.filter(d=>d.id!==id);save();renderPage(); }
+
+// ═══════════════════════════════
+// WEEKLY REPORT
+// ═══════════════════════════════
+function openWeeklyReport(){
+  const report = generateReport();
+  showModal(`
+    <div class="modal-title">📋 週報 — 貼給 Claude</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px">複製以下內容，貼給 Claude 討論進度或調整任務</div>
+    <textarea id="reportText" style="font-size:12px;font-family:'DM Mono',monospace;line-height:1.6;min-height:320px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:12px;width:100%;resize:vertical" readonly>${report}</textarea>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">關閉</button>
+      <button class="btn btn-amber" onclick="copyReport()">複製全部</button>
+    </div>`);
+  // auto-select
+  setTimeout(()=>{const el=document.getElementById('reportText');if(el){el.select();}},100);
+}
+
+function copyReport(){
+  const el=document.getElementById('reportText');
+  if(!el)return;
+  el.select();
+  try{
+    navigator.clipboard.writeText(el.value).then(()=>toast('✓ 已複製！貼給 Claude 吧'));
+  }catch(e){
+    document.execCommand('copy');
+    toast('✓ 已複製！');
+  }
+}
+
+function generateReport(){
+  const lines = ['pack','exhibit','stall'];
+  const lineNames = {pack:'📦 包裝',exhibit:'🎨 畢展',stall:'🍵 擺攤'};
+  const wLeft = {pack:weeksLeft('2025-05-10'),exhibit:weeksLeft('2025-05-23'),stall:weeksLeft('2025-05-23')};
+  const now = new Date().toLocaleDateString('zh-TW');
+  let r = '';
+
+  r += `═══════════════════════════\n`;
+  r += `畢製週報 ${now}（W${CUR_WEEK}）\n`;
+  r += `═══════════════════════════\n\n`;
+
+  // 各線進度
+  r += `【各線進度】\n`;
+  lines.forEach(line=>{
+    const tasks = db.weekPlans.filter(t=>t.line===line);
+    const done = tasks.filter(t=>t.status==='done').length;
+    const pct = tasks.length ? Math.round(done/tasks.length*100) : 0;
+    const bar = '█'.repeat(Math.round(pct/10))+'░'.repeat(10-Math.round(pct/10));
+    r += `${lineNames[line]}  ${bar}  ${done}/${tasks.length} (${pct}%)  剩 ${wLeft[line]} 週\n`;
+  });
+  r += '\n';
+
+  // 本週完成
+  const doneThisWeek = db.weekPlans.filter(t=>t.status==='done'&&t.week===CUR_WEEK);
+  r += `【本週完成】\n`;
+  if(doneThisWeek.length){
+    doneThisWeek.forEach(t=>{ r+=`✅ [${lineNames[t.line]}] ${t.text}\n`; });
+  } else {
+    r += `（本週尚無完成任務）\n`;
+  }
+  r += '\n';
+
+  // 進行中
+  const current = db.weekPlans.filter(t=>t.status==='current');
+  r += `【現在進行中】\n`;
+  if(current.length){
+    current.forEach(t=>{ r+=`🔥 [${lineNames[t.line]||t.line}] ${t.text}${t.note?'  →備注：'+t.note:''}\n`; });
+  } else {
+    r += `（無進行中任務）\n`;
+  }
+  r += '\n';
+
+  // 被擋住
+  const blocked = db.weekPlans.filter(t=>t.status==='upcoming'&&!isUnlocked(t));
+  r += `【被擋住的任務】\n`;
+  if(blocked.length){
+    blocked.forEach(t=>{
+      const deps=(t.blockedBy||[]).map(id=>{const d=db.weekPlans.find(x=>x.id===id);return d?d.text:'?';});
+      r+=`🔒 [${lineNames[t.line]||t.line}] ${t.text}\n    等待：${deps.join('、')}\n`;
+    });
+  } else {
+    r += `（無被擋住任務）\n`;
+  }
+  r += '\n';
+
+  // 可以開始但還沒開始
+  const unlocked = db.weekPlans.filter(t=>t.status==='upcoming'&&isUnlocked(t));
+  r += `【可以開始但還沒動】\n`;
+  if(unlocked.length){
+    unlocked.slice(0,6).forEach(t=>{ r+=`⬜ [${lineNames[t.line]||t.line}] W${t.week} ${t.text}\n`; });
+    if(unlocked.length>6) r+=`    ...還有 ${unlocked.length-6} 個\n`;
+  } else {
+    r += `（無）\n`;
+  }
+  r += '\n';
+
+  // 其他作業
+  const assignments = db.assignments||[];
+  const pendingA = assignments.filter(a=>!a.done);
+  r += `【其他作業】\n`;
+  if(pendingA.length){
+    pendingA.forEach(a=>{
+      const total=(a.tasks||[]).length;
+      const done=(a.tasks||[]).filter(t=>t.done).length;
+      const daysLeft=a.deadline?Math.ceil((new Date(a.deadline)-new Date(TODAY))/86400000):null;
+      r+=`📚 ${a.name}${a.course?' ('+a.course+')':''}`;
+      if(daysLeft!==null) r+=`  截止${daysLeft>0?daysLeft+'天後':daysLeft===0?'今天':'已過期'}`;
+      if(total) r+=`  子任務 ${done}/${total}`;
+      r+='\n';
+    });
+  } else {
+    r += `（無待完成作業）\n`;
+  }
+  r += '\n';
+
+  // 老師回饋（最近2筆）
+  const recentFeedback = [...(db.feedbacks||[])].reverse().slice(0,2);
+  if(recentFeedback.length){
+    r += `【最近老師回饋】\n`;
+    recentFeedback.forEach(f=>{
+      r+=`💬 ${f.date} [${lineNames[f.line]||f.line}] ${f.text}`;
+      if(f.action) r+=`\n    → 行動：${f.action}`;
+      r+='\n';
+    });
+    r+='\n';
+  }
+
+  // 卡住的地方（待決策）
+  const decisions=(db.decisions||[]).filter(d=>!d.resolved);
+  r += `【卡住／待決策】\n`;
+  if(decisions.length){
+    decisions.forEach(d=>{ r+=`❓ ${d.text}\n`; });
+  } else {
+    r += `（無待決策項目）\n`;
+  }
+
+  r += '\n═══════════════════════════\n';
+  r += `以上是我的現況，請幫我分析或調整任務。\n`;
+
+  return r;
+}
 
 // ═══════════════════════════════
 // MODAL
