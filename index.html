@@ -2,884 +2,780 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>任務指揮台</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>畢製追蹤</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f5f8;--bg2:#ecedf2;--bg3:#e2e4eb;--card:#ffffff;--card2:#f7f8fb;
+  --border:#d8dae4;--border2:#c8cad8;
+  --text:#1a1c2e;--text2:#5a5c78;--text3:#9a9cb8;
+  --amber:#c47a00;--teal:#0a8a68;--rose:#d03060;--blue:#2060c0;--purple:#6040c0;
+  --done:#0a8a68;--current:#c47a00;--blocked:#d03060;--upcoming:#9a9cb8;
+  --r:8px;
+}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none}
+.mono{font-family:'DM Mono',monospace}
+input,select,textarea{font-family:'Noto Sans TC',sans-serif;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:8px 12px;font-size:15px;width:100%;outline:none;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--amber)}
+textarea{resize:vertical;min-height:60px}
+button{font-family:'Noto Sans TC',sans-serif;cursor:pointer;border:none;border-radius:6px;font-size:13px;font-weight:500;transition:all .15s}
+.btn{padding:7px 14px;background:var(--card2);color:var(--text2);border:1px solid var(--border2)}
+.btn:hover{color:var(--text);border-color:var(--border2)}
+.btn-amber{background:rgba(240,184,64,.15);color:var(--amber);border:1px solid rgba(240,184,64,.3)}
+.btn-amber:hover{background:rgba(240,184,64,.25)}
+.btn-teal{background:rgba(45,232,176,.1);color:var(--teal);border:1px solid rgba(45,232,176,.3)}
+.btn-rose{background:rgba(240,96,128,.1);color:var(--rose);border:1px solid rgba(240,96,128,.3)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-ghost{background:transparent;color:var(--text3);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text2);border-color:var(--border2)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+label{font-size:12px;color:var(--text2);font-weight:600;display:block;margin-bottom:4px;letter-spacing:.3px}
+.fg{margin-bottom:12px}
 
-:root {
-  --bg: #f5f5f3;
-  --s1: #ffffff;
-  --s2: #f9f9f8;
-  --s3: #f0f0ee;
-  --border: #e0e0dc;
-  --text: #1a1a18;
-  --muted: #888884;
-  --dim: #b0b0ac;
-  --green: #2a8c4a;
-  --amber: #b8800a;
-  --red: #c04040;
-  --blue: #2a72b8;
-  --tag: #ededea;
-}
+/* Layout */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:52px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0}
+.sib{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .15s;background:transparent;border:none;color:var(--text3)}
+.sib:hover{background:var(--bg3);color:var(--text)}
+.sib.active{background:var(--amber);color:#000}
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.topbar{height:48px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.topbar-title{font-size:14px;font-weight:700;flex:1}
+.page{flex:1;overflow-y:auto;padding:20px}
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px}
+.page-title{font-size:18px;font-weight:700}
+.page-sub{font-size:11px;color:var(--text3);margin-top:2px}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; }
+/* Overlay */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:22px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:16px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 
-/* ── NAV ── */
-nav {
-  background: var(--s1);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  height: 52px;
-  gap: 0;
-  position: sticky; top: 0; z-index: 100;
-}
-.logo {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--amber);
-  letter-spacing: 3px;
-  margin-right: 32px;
-  white-space: nowrap;
-}
-.tab-btn {
-  background: none; border: none;
-  color: var(--muted);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 19px;
-  letter-spacing: 1px;
-  padding: 0 18px;
-  height: 52px;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.15s;
-}
-.tab-btn:hover { color: var(--text); }
-.tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border2);border-radius:20px;padding:8px 18px;font-size:12px;font-weight:600;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
+.toast.show{opacity:1}
 
-.nav-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+/* Status dots */
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sdot.done{background:var(--done)}
+.sdot.current{background:var(--amber)}
+.sdot.blocked{background:var(--rose)}
+.sdot.upcoming{background:var(--upcoming)}
 
-.pill {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 18px;
-  padding: 3px 10px;
-  border: 1px solid var(--border);
-  color: var(--muted);
-  border-radius: 20px;
-}
-.pill.can-move { border-color: var(--green); color: var(--green); }
+/* TODAY */
+.focus-card{background:linear-gradient(135deg,rgba(196,122,0,.06),rgba(196,122,0,.02));border:1px solid rgba(240,184,64,.3);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.focus-label{font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px}
+.focus-text{font-size:15px;font-weight:700;line-height:1.5}
+.week-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.week-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace}
 
-.add-btn {
-  background: var(--text);
-  color: #fff;
-  border: none;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 19px;
-  font-weight: 600;
-  padding: 7px 16px;
-  cursor: pointer;
-  letter-spacing: 1px;
-  transition: all 0.15s;
-}
-.add-btn:hover { background: #333; }
+/* Task tree */
+.task-tree{display:flex;flex-direction:column;gap:6px}
+.task-node{border-radius:6px;border:1px solid var(--border);overflow:hidden;transition:border .15s}
+.task-node.unlocked{border-color:var(--border2)}
+.task-node.locked{opacity:.5}
+.task-node.done-node{opacity:.4}
+.task-head{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;background:var(--card)}
+.task-head:hover{background:var(--card2)}
+.task-name{flex:1;font-size:14px;font-weight:600}
+.task-node.locked .task-name{color:var(--text3)}
+.task-meta{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+.task-body{padding:10px 12px 12px;background:var(--bg3);border-top:1px solid var(--border);display:none}
+.task-body.open{display:block}
+.task-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px}
+.task-deps{font-size:11px;color:var(--rose);margin-bottom:8px}
+.task-children{margin-top:8px;padding-left:12px;border-left:2px solid var(--border);display:flex;flex-direction:column;gap:4px}
 
-/* ── TABS ── */
-.tab-panel { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
-.tab-panel.active { display: block; }
+/* Line badge */
+.line-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0}
+.line-pack{background:rgba(160,128,240,.15);color:var(--purple)}
+.line-exhibit{background:rgba(45,232,176,.1);color:var(--teal)}
+.line-other{background:rgba(96,168,240,.1);color:var(--blue)}
 
-/* ── FOCUS BAR ── */
-.focus-bar {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--green);
-  padding: 12px 18px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.focus-bar .label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 18px;
-  color: var(--green);
-  letter-spacing: 2px;
-  white-space: nowrap;
-}
-.focus-chips { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
-.focus-chip {
-  background: var(--s3);
-  border: 1px solid var(--green);
-  color: var(--green);
-  font-size: 20px;
-  padding: 4px 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.focus-chip:hover { background: #1e2e1e; }
-.focus-empty { font-size: 20px; color: var(--muted); font-style: italic; }
+/* Status select */
+.status-sel{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.status-opt{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text3);transition:all .15s}
+.status-opt.active-done{background:rgba(45,232,176,.15);color:var(--teal);border-color:rgba(45,232,176,.4)}
+.status-opt.active-current{background:rgba(240,184,64,.15);color:var(--amber);border-color:rgba(240,184,64,.4)}
+.status-opt.active-blocked{background:rgba(240,96,128,.15);color:var(--rose);border-color:rgba(240,96,128,.4)}
+.status-opt.active-upcoming{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
 
-/* ── PROJECT CARDS ── */
-.projects-grid { display: flex; flex-direction: column; gap: 14px; }
+/* Week plan */
+.week-plan{margin-bottom:20px}
+.week-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.week-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);padding:2px 8px;border:1px solid var(--border);border-radius:10px}
+.week-task-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:4px;cursor:pointer}
+.week-task-row:hover{border-color:var(--border2)}
+.week-task-row.done-row{opacity:.4}
+.week-task-text{flex:1;font-size:13px}
 
-.pcard {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--blue);
-  transition: border-color 0.2s;
-}
-.pcard.has-urgent { border-left-color: var(--red); }
-.pcard.all-waiting { border-left-color: var(--muted); }
+/* Memo / feedback */
+.memo-row{padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:6px}
+.memo-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin-bottom:4px}
+.memo-text{font-size:14px;line-height:1.6;white-space:pre-wrap}
 
-.pcard-head {
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
+/* Mobile */
+@media(max-width:640px){
+  .app{flex-direction:column}
+  .sidebar{width:100%;height:56px;flex-direction:row;justify-content:space-around;position:fixed;bottom:0;left:0;right:0;z-index:50;border-top:1px solid var(--border);border-right:none;border-bottom:none;padding:0 4px;gap:0}
+  .sib{width:44px;height:44px;border-radius:10px;font-size:18px}
+  .main{padding-bottom:56px;height:100vh}
+  .page{padding:14px 12px;font-size:15px}
+  .page-header{margin-bottom:14px}
+  .page-title{font-size:17px}
+  .topbar{height:44px;padding:0 14px}
+  .topbar-title{font-size:15px}
+  .overlay{align-items:flex-end;padding:0}
+  .modal{border-radius:16px 16px 0 0;max-width:100%;max-height:92vh;padding:18px 16px}
+  .modal-title{font-size:16px}
+  .focus-card{padding:14px}
+  .focus-text{font-size:15px}
+  .card{padding:12px}
+  .week-task-row{padding:10px 10px;gap:8px}
+  .week-task-text{font-size:13px}
+  .memo-text{font-size:14px}
+  .memo-row{padding:12px}
+  .line-badge{font-size:11px;padding:3px 9px}
+  input,select,textarea{font-size:16px !important}
+  .btn-sm{padding:6px 12px;font-size:12px}
+  .status-sel{gap:6px}
+  .status-opt{padding:6px 12px;font-size:12px}
+  .modal-footer{gap:8px}
+  .modal-footer button{padding:10px 16px;font-size:13px}
 }
-.pcard-head:hover .pname { color: var(--amber); }
-
-.pname { font-size: 19px; font-weight: 500; transition: color 0.15s; }
-.pmeta { font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: var(--muted); margin-top: 3px; }
-
-.lane-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
-.lpill {
-  font-size: 18px;
-  font-family: 'IBM Plex Mono', monospace;
-  padding: 2px 9px;
-  border: 1px solid;
-  border-radius: 2px;
+@media(min-width:641px) and (max-width:900px){
+  .sidebar{width:44px}
+  .sib{width:32px;height:32px}
+  .page{padding:16px}
 }
-.lpill.go { border-color: var(--green); color: var(--green); }
-.lpill.wait { border-color: var(--dim); color: var(--dim); }
-
-.icon-btn {
-  background: none; border: 1px solid var(--border);
-  color: var(--muted);
-  width: 26px; height: 26px;
-  cursor: pointer; font-size: 20px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s; flex-shrink: 0;
-}
-.icon-btn:hover { border-color: var(--amber); color: var(--amber); }
-.icon-btn.del:hover { border-color: var(--red); color: var(--red); }
-
-/* ── CARD BODY ── */
-.pcard-body { display: none; border-top: 1px solid var(--border); }
-.pcard-body.open { display: block; }
-
-.pcard-inner { padding: 16px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 640px) { .pcard-inner { grid-template-columns: 1fr; } }
-
-.field-block { display: flex; flex-direction: column; gap: 6px; }
-.field-block.full { grid-column: 1 / -1; }
-
-.flabel {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 18px;
-  color: var(--muted);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-textarea.fld, input.fld {
-  background: var(--s2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-family: 'Noto Sans TC', sans-serif;
-  font-size: 17px;
-  padding: 9px 11px;
-  resize: vertical;
-  line-height: 1.7;
-  transition: border-color 0.15s;
-  width: 100%;
-}
-textarea.fld { min-height: 70px; }
-textarea.fld:focus, input.fld:focus { outline: none; border-color: var(--blue); }
-textarea.fld::placeholder, input.fld::placeholder { color: var(--dim); }
-
-/* ── LANES SECTION ── */
-.lanes-section { grid-column: 1 / -1; }
-
-.lanes-header {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
-}
-
-.lanes-list { display: flex; flex-direction: column; gap: 8px; }
-
-.lane-item {
-  background: var(--s2);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--dim);
-  padding: 10px 14px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  transition: border-color 0.2s;
-}
-.lane-item.go { border-left-color: var(--green); }
-.lane-item.wait { border-left-color: var(--amber); opacity: 0.75; }
-
-.lane-status-btn {
-  background: none; border: 1px solid var(--dim);
-  color: var(--dim);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 17px;
-  padding: 3px 8px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s;
-  flex-shrink: 0;
-  margin-top: 1px;
-  letter-spacing: 1px;
-}
-.lane-item.go .lane-status-btn { border-color: var(--green); color: var(--green); }
-.lane-item.wait .lane-status-btn { border-color: var(--amber); color: var(--amber); }
-.lane-status-btn:hover { opacity: 0.7; }
-
-.lane-content { flex: 1; }
-.lane-name { font-size: 17px; font-weight: 500; }
-.lane-detail {
-  font-size: 20px;
-  color: var(--muted);
-  margin-top: 3px;
-  line-height: 1.5;
-}
-.lane-wait-reason {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 18px;
-  color: var(--amber);
-  margin-top: 4px;
-}
-
-.lane-eta {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 18px;
-  color: var(--dim);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.lane-edit-btn {
-  background: none; border: none;
-  color: var(--dim); cursor: pointer; font-size: 17px;
-  padding: 2px 4px; flex-shrink: 0;
-  transition: color 0.15s;
-}
-.lane-edit-btn:hover { color: var(--amber); }
-
-/* add lane row */
-.add-lane-row {
-  background: var(--s2);
-  border: 1px dashed var(--border);
-  padding: 8px 12px;
-  display: flex; gap: 8px; align-items: center;
-}
-.add-lane-row input, .add-lane-row select {
-  background: none; border: none;
-  color: var(--text);
-  font-family: 'Noto Sans TC', sans-serif;
-  font-size: 17px;
-  flex: 1;
-}
-.add-lane-row input:focus, .add-lane-row select:focus { outline: none; }
-.add-lane-row input::placeholder { color: var(--dim); }
-.add-lane-row select { color: var(--muted); max-width: 100px; background: var(--s2); }
-.add-lane-row select option { background: var(--s2); }
-
-/* ── TODAY VIEW ── */
-.today-header {
-  display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
-}
-.today-date {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 19px;
-  color: var(--muted);
-}
-.section-title {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 19px;
-  color: var(--muted);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  display: flex; align-items: center; gap: 8px;
-}
-.section-title::after {
-  content: '';
-  flex: 1; height: 1px;
-  background: var(--border);
-}
-
-.today-go { margin-bottom: 28px; }
-.today-wait { opacity: 0.8; }
-
-.today-lane {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--green);
-  padding: 12px 16px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-}
-.today-lane.wait { border-left-color: var(--dim); background: var(--s2); }
-
-.tl-project {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 18px;
-  color: var(--muted);
-  white-space: nowrap;
-  padding-top: 2px;
-  min-width: 100px;
-}
-.tl-name { font-size: 18px; font-weight: 500; }
-.tl-detail { font-size: 20px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
-.tl-wait-reason { font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: var(--amber); margin-top: 4px; }
-
-.tl-toggle {
-  margin-left: auto;
-  background: none; border: 1px solid var(--border);
-  color: var(--dim); cursor: pointer; font-size: 18px;
-  font-family: 'IBM Plex Mono', monospace;
-  padding: 3px 9px; white-space: nowrap;
-  transition: all 0.15s; flex-shrink: 0;
-}
-.tl-toggle:hover { border-color: var(--green); color: var(--green); }
-.today-lane.wait .tl-toggle:hover { border-color: var(--amber); color: var(--amber); }
-
-/* ── MODAL ── */
-.overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.75);
-  z-index: 200; align-items: center; justify-content: center;
-}
-.overlay.open { display: flex; }
-
-.modal {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  width: 460px; max-width: 94vw;
-  padding: 26px;
-  animation: mfade 0.18s;
-}
-@keyframes mfade {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.modal h2 {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 20px; letter-spacing: 3px; color: var(--amber);
-  margin-bottom: 18px;
-}
-.fg { margin-bottom: 13px; }
-.fl { font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: var(--muted); display: block; margin-bottom: 5px; letter-spacing: 1px; }
-.fi {
-  width: 100%; background: var(--s2); border: 1px solid var(--border);
-  color: var(--text); font-family: 'Noto Sans TC', sans-serif;
-  font-size: 17px; padding: 9px 11px;
-}
-.fi:focus { outline: none; border-color: var(--blue); }
-.modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
-.mbtn {
-  background: var(--amber); color: #fff;
-  border: none; font-family: 'IBM Plex Mono', monospace;
-  font-size: 19px; font-weight: 600; padding: 9px 22px; cursor: pointer;
-  transition: all 0.15s;
-}
-.mbtn:hover { background: #f5cd6a; }
-.mbtn.cancel {
-  background: none; border: 1px solid var(--border); color: var(--muted);
-}
-.mbtn.cancel:hover { border-color: var(--muted); color: var(--text); }
-
-/* lane modal */
-.lane-modal-status {
-  display: flex; gap: 8px;
-}
-.lms-btn {
-  flex: 1; padding: 8px; text-align: center;
-  border: 1px solid var(--border); cursor: pointer;
-  font-family: 'IBM Plex Mono', monospace; font-size: 19px;
-  background: none; color: var(--muted);
-  transition: all 0.15s;
-}
-.lms-btn.sel.go { border-color: var(--green); color: var(--green); background: #edf7f0; }
-.lms-btn.sel.wait { border-color: var(--amber); color: var(--amber); background: #fdf6e8; }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 20px; right: 20px;
-  background: var(--s3); border: 1px solid var(--border);
-  color: var(--text); font-family: 'IBM Plex Mono', monospace;
-  font-size: 19px; padding: 9px 16px; z-index: 300;
-  opacity: 0; transition: opacity 0.25s; pointer-events: none;
-}
-.toast.show { opacity: 1; }
-
-.empty-state {
-  text-align: center; padding: 50px 20px; color: var(--muted);
-}
-.empty-state .icon { font-size: 36px; margin-bottom: 10px; }
-.empty-state p { font-size: 17px; line-height: 1.9; }
 </style>
 </head>
 <body>
-
-<nav>
-  <div class="logo">CONTROL</div>
-  <button class="tab-btn active" onclick="switchTab('today')">TODAY</button>
-  <button class="tab-btn" onclick="switchTab('projects')">PROJECTS</button>
-  <div class="nav-right">
-    <span class="pill can-move" id="navGo">0 可推進</span>
-    <span class="pill" id="navWait">0 等待中</span>
-    <button class="add-btn" id="navAddBtn" onclick="openProjectModal()">＋ 新增專案</button>
-  </div>
-</nav>
-
-<!-- TODAY TAB -->
-<div class="tab-panel active" id="tab-today">
-  <div class="today-header">
-    <div style="font-size:20px;font-weight:500">今天可以動的任務</div>
-    <div class="today-date" id="todayDate"></div>
-  </div>
-
-  <div class="focus-bar" id="focusBar">
-    <span class="label">NOW →</span>
-    <div class="focus-chips" id="focusChips"></div>
-  </div>
-
-  <div class="today-go">
-    <div class="section-title"><span style="color:var(--green)">▶ 可以推進</span></div>
-    <div id="todayGoList"></div>
-  </div>
-
-  <div class="today-wait">
-    <div class="section-title"><span>⏸ 等待中</span></div>
-    <div id="todayWaitList"></div>
+<div class="app">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">畢製追蹤</div>
+      <div class="mono" style="font-size:11px;color:var(--text3)" id="topbarDate"></div>
+      <button class="btn btn-sm" onclick="manualSave()">💾</button>
+    </div>
+    <div class="page" id="pageContent"></div>
   </div>
 </div>
-
-<!-- PROJECTS TAB -->
-<div class="tab-panel" id="tab-projects">
-  <div class="projects-grid" id="projectsGrid"></div>
-</div>
-
-<!-- PROJECT MODAL -->
-<div class="overlay" id="projOverlay">
-  <div class="modal">
-    <h2>NEW PROJECT</h2>
-    <div class="fg">
-      <label class="fl">專案名稱 *</label>
-      <input class="fi" id="pNewName" placeholder="例：後台系統重構" />
-    </div>
-    <div class="fg">
-      <label class="fl">截止日期（選填）</label>
-      <input class="fi" type="date" id="pNewDeadline" />
-    </div>
-    <div class="modal-btns">
-      <button class="mbtn cancel" onclick="closeProjModal()">取消</button>
-      <button class="mbtn" onclick="createProject()">建立</button>
-    </div>
-  </div>
-</div>
-
-<!-- LANE MODAL -->
-<div class="overlay" id="laneOverlay">
-  <div class="modal">
-    <h2 id="laneModalTitle">ADD LANE</h2>
-    <div class="fg">
-      <label class="fl">任務線名稱 *</label>
-      <input class="fi" id="lNewName" placeholder="例：API 串接、UI 切版、文件撰寫" />
-    </div>
-    <div class="fg">
-      <label class="fl">狀態</label>
-      <div class="lane-modal-status">
-        <button class="lms-btn sel go" id="lmsGo" onclick="selectLaneStatus('go')">▶ 可推進</button>
-        <button class="lms-btn wait" id="lmsWait" onclick="selectLaneStatus('wait')">⏸ 等待中</button>
-      </div>
-    </div>
-    <div class="fg" id="waitReasonGroup" style="display:none">
-      <label class="fl">等待什麼？（選填）</label>
-      <input class="fi" id="lWaitReason" placeholder="例：等 PM 確認需求、等後端 API" />
-    </div>
-    <div class="fg">
-      <label class="fl">目前進度 / 備注（選填）</label>
-      <input class="fi" id="lDetail" placeholder="做到哪了、下一步..." />
-    </div>
-    <div class="fg">
-      <label class="fl">預估完成（選填）</label>
-      <input class="fi" id="lEta" placeholder="例：2天、下週五" />
-    </div>
-    <div class="modal-btns">
-      <button class="mbtn cancel" onclick="closeLaneModal()">取消</button>
-      <button class="mbtn" onclick="saveLane()">儲存</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY = 'control_v2';
-function load() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
-function save() { localStorage.setItem(KEY, JSON.stringify(projects)); }
+// ═══════════════════════════════
+// CONFIG
+// ═══════════════════════════════
+const API_URL = '';
+const KEY = 'grad_v5';
+const TODAY = new Date().toISOString().slice(0,10);
+const CUR_WEEK = getWeekNum(TODAY);
 
-let projects = load();
-let currentTab = 'today';
-let editingLane = null; // {pid, lid}
-let addingLanePid = null;
-let laneStatus = 'go';
-
-// ── HELPERS ──
-function esc(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function getWeekNum(dateStr){
+  const start = new Date('2025-03-19'); // 學期開始
+  const d = new Date(dateStr);
+  return Math.ceil((d - start) / (7*24*60*60*1000)) + 1;
 }
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2200);
-}
-function timeAgo(iso) {
-  const d = Date.now() - new Date(iso);
-  const m = Math.floor(d/60000);
-  if (m < 1) return '剛剛';
-  if (m < 60) return `${m}分前`;
-  const h = Math.floor(m/60);
-  if (h < 24) return `${h}h前`;
-  return `${Math.floor(h/24)}天前`;
+function weeksLeft(deadline){
+  const d = new Date(deadline);
+  const t = new Date(TODAY);
+  return Math.ceil((d - t) / (7*24*60*60*1000));
 }
 
-// ── NAV COUNTS ──
-function updateCounts() {
-  let go = 0, wait = 0;
-  projects.forEach(p => p.lanes.forEach(l => { if (l.status === 'go') go++; else wait++; }));
-  document.getElementById('navGo').textContent = `${go} 可推進`;
-  document.getElementById('navWait').textContent = `${wait} 等待中`;
+// ═══════════════════════════════
+// DATA
+// ═══════════════════════════════
+function defDB(){
+  return {
+    _updatedAt:'',
+    apiUrl: API_URL,
+    // 週計畫
+    weekPlans: [
+      // 包裝線
+      {id:'w1p1',week:1,line:'pack',text:'確定精露組產品結構（不回頭）',status:'current',note:''},
+      {id:'w1p2',week:1,line:'pack',text:'畫5張精露噴霧草稿（植物圖鑑風格）',status:'upcoming',note:'',blockedBy:[]},
+      {id:'w2p1',week:2,line:'pack',text:'Moodboard完成，與老師確認視覺方向',status:'upcoming',note:'',blockedBy:['w1p1']},
+      {id:'w2p2',week:2,line:'pack',text:'LOGO第一版草稿',status:'upcoming',note:'',blockedBy:['w1p2']},
+      {id:'w3p1',week:3,line:'pack',text:'瓶身標籤設計提案2-3版',status:'upcoming',note:'',blockedBy:['w2p1','w2p2']},
+      {id:'w4p1',week:4,line:'pack',text:'單品包裝設計，老師review',status:'upcoming',note:'',blockedBy:['w3p1']},
+      {id:'w5p1',week:5,line:'pack',text:'禮盒設計（若做）',status:'upcoming',note:'',blockedBy:['w4p1']},
+      {id:'w6p1',week:6,line:'pack',text:'全部定稿，送印',status:'upcoming',note:'',blockedBy:['w5p1']},
+      {id:'w7p1',week:7,line:'pack',text:'收件確認印刷品質',status:'upcoming',note:'',blockedBy:['w6p1']},
+      // 畢展線
+      {id:'w1e1',week:1,line:'exhibit',text:'問老師海報/邀卡要加什麼（本週最重要）',status:'current',note:'這個不解決整條印刷線卡死'},
+      {id:'w2e1',week:2,line:'exhibit',text:'海報/邀卡定稿',status:'upcoming',note:'',blockedBy:['w1e1']},
+      {id:'w3e1',week:3,line:'exhibit',text:'發包印刷',status:'upcoming',note:'',blockedBy:['w2e1']},
+      {id:'w3e2',week:3,line:'exhibit',text:'開始場地規劃（動線/攤位）',status:'upcoming',note:''},
+      {id:'w4e1',week:4,line:'exhibit',text:'大型輸出尺寸確認',status:'upcoming',note:'',blockedBy:['w3e1']},
+      {id:'w4e2',week:4,line:'exhibit',text:'場地動線確認',status:'upcoming',note:'',blockedBy:['w3e2']},
+      {id:'w6e1',week:6,line:'exhibit',text:'所有印刷收件',status:'upcoming',note:'',blockedBy:['w3e1']},
+      {id:'w7e1',week:7,line:'exhibit',text:'布展準備',status:'upcoming',note:'',blockedBy:['w6e1','w4e2']},
+    ],
+    // 老師回饋
+    feedbacks: [],
+    // 廠商
+    vendors: [],
+    // 隨手記
+    memos: [],
+    // 待決策
+    decisions: [],
+  };
 }
 
-// ── TAB ──
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    const tabs = ['today','projects'];
-    b.classList.toggle('active', tabs[i] === tab);
+let db = (() => { try{ return JSON.parse(localStorage.getItem(KEY)) || defDB(); } catch{ return defDB(); } })();
+
+function saveDB(){
+  db._updatedAt = new Date().toISOString();
+  localStorage.setItem(KEY, JSON.stringify(db));
+}
+
+// ═══════════════════════════════
+// SYNC
+// ═══════════════════════════════
+function setSyncState(s){
+  const el = document.getElementById('topbarDate');
+  if(!el) return;
+  const states = {ok:'✓ 已同步',err:'✗ 同步失敗',loading:'⟳ 同步中'};
+  el.textContent = states[s] || TODAY;
+  el.style.color = s==='ok'?'var(--teal)':s==='err'?'var(--rose)':'var(--amber)';
+  if(s==='ok'||s==='err') setTimeout(()=>{el.textContent=TODAY;el.style.color='var(--text3)';},3000);
+}
+async function pushSync(){
+  if(!db.apiUrl) return;
+  setSyncState('loading');
+  try{
+    const resp = await fetch(db.apiUrl,{method:'POST',body:JSON.stringify({action:'saveAll',data:db})});
+    const r = await resp.json();
+    if(r.ok) setSyncState('ok'); else throw new Error(r.error);
+  }catch(e){ setSyncState('err'); console.warn(e); throw e; }
+}
+function manualSave(){
+  saveDB();
+  if(db.apiUrl) pushSync().then(()=>toast('✅ 已存檔')).catch(()=>toast('❌ 存檔失敗'));
+  else { toast('✓ 已存本機'); }
+}
+let _debTimer = null;
+function save(){ saveDB(); clearTimeout(_debTimer); _debTimer = setTimeout(()=>{ if(db.apiUrl) pushSync(); }, 3000); }
+
+// ═══════════════════════════════
+// UTILS
+// ═══════════════════════════════
+const uid = () => '_'+Math.random().toString(36).slice(2,8);
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function toast(msg,dur=2500){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+function isUnlocked(task){
+  if(!task.blockedBy||!task.blockedBy.length) return true;
+  return task.blockedBy.every(depId=>{
+    const dep = db.weekPlans.find(t=>t.id===depId);
+    return dep && dep.status==='done';
   });
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById(`tab-${tab}`).classList.add('active');
-  document.getElementById('navAddBtn').onclick = tab === 'projects' ? openProjectModal : openProjectModal;
-  renderAll();
+}
+function statusLabel(s){
+  return {done:'✅ 完成',current:'🔥 進行中',blocked:'🔒 被擋住',upcoming:'⬜ 待辦'}[s]||s;
+}
+function lineName(l){
+  return {pack:'📦 包裝',exhibit:'🎨 畢展',other:'📌 其他'}[l]||l;
 }
 
-// ── RENDER ALL ──
-function renderAll() {
-  save();
-  updateCounts();
-  renderToday();
-  renderProjects();
+// ═══════════════════════════════
+// NAV
+// ═══════════════════════════════
+const NAV = [
+  {id:'today',icon:'◈',label:'TODAY'},
+  {id:'pack',icon:'📦',label:'包裝線'},
+  {id:'exhibit',icon:'🎨',label:'畢展線'},
+  {id:'feedback',icon:'💬',label:'老師回饋'},
+  {id:'vendor',icon:'🏭',label:'廠商'},
+  {id:'memo',icon:'📝',label:'隨手記'},
+  {id:'settings',icon:'⚙',label:'設定'},
+];
+let activeTab = 'today';
+let openTaskId = null;
+
+function renderNav(){
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = NAV.map(n=>`
+    <button class="sib${activeTab===n.id?' active':''}" onclick="goto('${n.id}')" title="${n.label}">
+      <span style="font-size:15px">${n.icon}</span>
+    </button>`).join('');
+}
+function goto(tab){ activeTab=tab; renderAll(); }
+function renderAll(){ renderNav(); renderPage(); }
+
+// ═══════════════════════════════
+// PAGES
+// ═══════════════════════════════
+function renderPage(){
+  const t = document.getElementById('topbarTitle');
+  const el = document.getElementById('pageContent');
+  const titles = {today:'TODAY',pack:'📦 包裝線',exhibit:'🎨 畢展線',feedback:'💬 老師回饋',vendor:'🏭 廠商資料',memo:'📝 隨手記',settings:'⚙ 設定'};
+  if(t) t.textContent = titles[activeTab]||'畢製追蹤';
+  switch(activeTab){
+    case 'today':    el.innerHTML = pageToday(); break;
+    case 'pack':     el.innerHTML = pageLine('pack'); break;
+    case 'exhibit':  el.innerHTML = pageLine('exhibit'); break;
+    case 'feedback': el.innerHTML = pageFeedback(); break;
+    case 'vendor':   el.innerHTML = pageVendor(); break;
+    case 'memo':     el.innerHTML = pageMemo(); break;
+    case 'settings': el.innerHTML = pageSettings(); break;
+  }
 }
 
-// ── TODAY ──
-function renderToday() {
-  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+// ─── TODAY ───
+function pageToday(){
+  const curTasks = db.weekPlans.filter(t=>t.status==='current');
+  const unlockedTasks = db.weekPlans.filter(t=>t.status==='upcoming'&&isUnlocked(t));
+  const blockedTasks = db.weekPlans.filter(t=>t.status==='upcoming'&&!isUnlocked(t));
+  const wLeft5_10 = weeksLeft('2025-05-10');
+  const wLeft5_23 = weeksLeft('2025-05-23');
+  const doneCount = db.weekPlans.filter(t=>t.status==='done').length;
+  const total = db.weekPlans.length;
 
-  const goList = document.getElementById('todayGoList');
-  const waitList = document.getElementById('todayWaitList');
-  const focusChips = document.getElementById('focusChips');
+  // current week tasks
+  const thisWeek = db.weekPlans.filter(t=>t.week===CUR_WEEK||t.status==='current');
 
-  goList.innerHTML = '';
-  waitList.innerHTML = '';
-  focusChips.innerHTML = '';
+  return `
+  <div style="margin-bottom:20px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+      <div class="card" style="flex:1;min-width:120px;border-color:rgba(240,184,64,.3)">
+        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">包裝截止</div>
+        <div style="font-size:20px;font-weight:700;color:var(--amber);font-family:'DM Mono',monospace">${wLeft5_10}週</div>
+        <div style="font-size:10px;color:var(--text3)">5/10</div>
+      </div>
+      <div class="card" style="flex:1;min-width:120px;border-color:rgba(45,232,176,.2)">
+        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">畢展</div>
+        <div style="font-size:20px;font-weight:700;color:var(--teal);font-family:'DM Mono',monospace">${wLeft5_23}週</div>
+        <div style="font-size:10px;color:var(--text3)">5/23</div>
+      </div>
+      <div class="card" style="flex:1;min-width:120px">
+        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">進度</div>
+        <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace">${doneCount}/${total}</div>
+        <div style="height:4px;background:var(--bg3);border-radius:2px;margin-top:6px"><div style="height:4px;background:var(--teal);border-radius:2px;width:${Math.round(doneCount/total*100)}%"></div></div>
+      </div>
+    </div>
 
-  let anyGo = false, anyWait = false;
+    ${curTasks.length?`
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">🔥 現在在做</div>
+      ${curTasks.map(t=>`
+        <div class="focus-card" style="margin-bottom:8px;cursor:pointer" onclick="openTaskModal('${t.id}')">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="line-badge line-${t.line}">${lineName(t.line)}</span>
+            <div style="flex:1;font-size:14px;font-weight:700">${esc(t.text)}</div>
+            <button class="btn btn-teal btn-sm" onclick="event.stopPropagation();markDone('${t.id}')">✓ 完成</button>
+          </div>
+          ${t.note?`<div style="font-size:11px;color:var(--text3);margin-top:6px">${esc(t.note)}</div>`:''}
+        </div>`).join('')}
+    </div>`:''}
 
-  projects.forEach(p => {
-    p.lanes.forEach(l => {
-      const isGo = l.status === 'go';
-      if (isGo) anyGo = true; else anyWait = true;
+    ${unlockedTasks.length?`
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">⬜ 可以開始做</div>
+      ${unlockedTasks.slice(0,5).map(t=>`
+        <div class="week-task-row" onclick="openTaskModal('${t.id}')">
+          <span class="line-badge line-${t.line}">${lineName(t.line)}</span>
+          <div class="week-task-text">${esc(t.text)}</div>
+          <span class="mono" style="font-size:10px;color:var(--text3)">W${t.week}</span>
+          <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();setStatus('${t.id}','current')">開始</button>
+        </div>`).join('')}
+    </div>`:''}
 
-      const div = document.createElement('div');
-      div.className = `today-lane ${isGo ? '' : 'wait'}`;
-      div.innerHTML = `
-        <div class="tl-project">${esc(p.name)}</div>
-        <div style="flex:1">
-          <div class="tl-name">${esc(l.name)}</div>
-          ${l.detail ? `<div class="tl-detail">${esc(l.detail)}</div>` : ''}
-          ${!isGo && l.waitReason ? `<div class="tl-wait-reason">等：${esc(l.waitReason)}</div>` : ''}
-          ${l.eta ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--dim);margin-top:3px">⏱ ${esc(l.eta)}</div>` : ''}
+    ${blockedTasks.length?`
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;color:var(--rose);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">🔒 被前面卡住 (${blockedTasks.length})</div>
+      ${blockedTasks.slice(0,3).map(t=>{
+        const deps = (t.blockedBy||[]).map(id=>{
+          const dep=db.weekPlans.find(x=>x.id===id);
+          return dep?esc(dep.text):'?';
+        });
+        return `<div class="week-task-row locked" style="opacity:.5">
+          <span class="line-badge line-${t.line}">${lineName(t.line)}</span>
+          <div class="week-task-text">${esc(t.text)}</div>
+          <div style="font-size:10px;color:var(--rose)">等：${deps.join('、')}</div>
+        </div>`;
+      }).join('')}
+    </div>`:''}
+
+    ${db.decisions.filter(d=>!d.resolved).length?`
+    <div class="card" style="border-color:rgba(240,96,128,.3)">
+      <div style="font-size:10px;color:var(--rose);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">❓ 待決策</div>
+      ${db.decisions.filter(d=>!d.resolved).map(d=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+          <div style="flex:1;font-size:12px">${esc(d.text)}</div>
+          <button class="btn btn-sm btn-ghost" onclick="resolveDecision('${d.id}')">✓ 決定了</button>
+        </div>`).join('')}
+    </div>`:''}
+  </div>`;
+}
+
+// ─── LINE PAGE ───
+function pageLine(line){
+  const tasks = db.weekPlans.filter(t=>t.line===line);
+  const weeks = [...new Set(tasks.map(t=>t.week))].sort((a,b)=>a-b);
+  const done = tasks.filter(t=>t.status==='done').length;
+
+  return `
+  <div class="page-header">
+    <div>
+      <div class="page-title">${lineName(line)}</div>
+      <div class="page-sub mono">完成 ${done}/${tasks.length}</div>
+    </div>
+    <button class="btn btn-amber btn-sm" onclick="openAddTask('${line}')">＋ 新增任務</button>
+  </div>
+  <div style="height:4px;background:var(--bg3);border-radius:2px;margin-bottom:20px">
+    <div style="height:4px;background:var(--${line==='pack'?'amber':'teal'});border-radius:2px;width:${tasks.length?Math.round(done/tasks.length*100):0}%;transition:width .3s"></div>
+  </div>
+  ${weeks.map(w=>{
+    const wtasks = tasks.filter(t=>t.week===w);
+    const wDone = wtasks.filter(t=>t.status==='done').length;
+    const isCur = w===CUR_WEEK;
+    return `
+    <div class="week-plan">
+      <div class="week-header">
+        <span class="week-num" style="${isCur?'border-color:var(--amber);color:var(--amber)':''}">W${w}</span>
+        <span style="font-size:11px;color:var(--text3)">${wDone}/${wtasks.length} 完成</span>
+        ${isCur?'<span style="font-size:10px;color:var(--amber);font-family:\'DM Mono\',monospace">← 本週</span>':''}
+      </div>
+      ${wtasks.map(t=>{
+        const unlocked = isUnlocked(t);
+        return `<div class="week-task-row${t.status==='done'?' done-row':''}${!unlocked?' locked':''}" onclick="openTaskModal('${t.id}')">
+          <div class="sdot ${t.status==='done'?'done':t.status==='current'?'current':unlocked?'upcoming':'blocked'}"></div>
+          <div class="week-task-text">${esc(t.text)}</div>
+          ${t.note?`<span style="font-size:10px;color:var(--text3)">有備注</span>`:''}
+          ${!unlocked?'<span style="font-size:10px;color:var(--rose)">🔒</span>':''}
+          <div style="display:flex;gap:4px" onclick="event.stopPropagation()">
+            ${t.status!=='done'?`<button class="btn btn-sm btn-ghost" onclick="markDone('${t.id}')">✓</button>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('')}`;
+}
+
+// ─── FEEDBACK ───
+function pageFeedback(){
+  return `
+  <div class="page-header">
+    <div><div class="page-title">老師回饋</div></div>
+    <button class="btn btn-amber btn-sm" onclick="openAddFeedback()">＋ 記錄回饋</button>
+  </div>
+  ${db.feedbacks.length?[...db.feedbacks].reverse().map(f=>`
+    <div class="memo-row" style="border-left:3px solid ${f.line==='pack'?'var(--amber)':'var(--teal)'}">
+      <div class="memo-label">${f.date} · ${lineName(f.line)}</div>
+      <div class="memo-text">${esc(f.text)}</div>
+      ${f.action?`<div style="margin-top:6px;font-size:11px;color:var(--amber)">→ 行動：${esc(f.action)}</div>`:''}
+      <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="deleteFeedback('${f.id}')">刪除</button>
+    </div>`).join('')
+  :'<div style="color:var(--text3);font-size:13px;padding:20px">還沒有回饋記錄</div>'}`;
+}
+
+// ─── VENDOR ───
+function pageVendor(){
+  return `
+  <div class="page-header">
+    <div><div class="page-title">廠商資料</div></div>
+    <button class="btn btn-amber btn-sm" onclick="openAddVendor()">＋ 新增廠商</button>
+  </div>
+  ${db.vendors.length?db.vendors.map(v=>`
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="font-weight:700;flex:1">${esc(v.name)}</div>
+        <span class="line-badge line-${v.line||'other'}">${lineName(v.line||'other')}</span>
+        <button class="btn btn-ghost btn-sm" onclick="deleteVendor('${v.id}')">✕</button>
+      </div>
+      ${v.contact?`<div style="font-size:12px;color:var(--text2)">聯絡：${esc(v.contact)}</div>`:''}
+      ${v.product?`<div style="font-size:12px;color:var(--text2)">品項：${esc(v.product)}</div>`:''}
+      ${v.price?`<div style="font-size:12px;color:var(--amber)">報價：${esc(v.price)}</div>`:''}
+      ${v.note?`<div style="font-size:11px;color:var(--text3);margin-top:6px">${esc(v.note)}</div>`:''}
+    </div>`).join('')
+  :'<div style="color:var(--text3);font-size:13px;padding:20px">還沒有廠商資料</div>'}`;
+}
+
+// ─── MEMO ───
+function pageMemo(){
+  const pending = db.decisions.filter(d=>!d.resolved);
+  const resolved = db.decisions.filter(d=>d.resolved);
+  return `
+  <div class="page-header">
+    <div><div class="page-title">隨手記</div></div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-sm btn-ghost" onclick="openAddDecision()">＋ 待決策</button>
+      <button class="btn btn-amber btn-sm" onclick="openAddMemo()">＋ 記錄</button>
+    </div>
+  </div>
+  ${pending.length?`
+  <div style="margin-bottom:16px">
+    <div style="font-size:10px;color:var(--rose);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">❓ 待決策 (${pending.length})</div>
+    ${pending.map(d=>`
+      <div class="memo-row" style="border-left:3px solid var(--rose)">
+        <div class="memo-text">${esc(d.text)}</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn btn-teal btn-sm" onclick="resolveDecision('${d.id}')">✓ 決定了</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteDecision('${d.id}')">刪除</button>
         </div>
-        <button class="tl-toggle" onclick="quickToggleLane('${p.id}','${l.id}')">
-          ${isGo ? '→ 等待' : '→ 推進'}
-        </button>
-      `;
-      if (isGo) goList.appendChild(div);
-      else waitList.appendChild(div);
+      </div>`).join('')}
+  </div>`:''}
+  <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">📝 備忘</div>
+  ${[...db.memos].reverse().map(m=>`
+    <div class="memo-row">
+      <div class="memo-label">${m.date}${m.line?' · '+lineName(m.line):''}</div>
+      <div class="memo-text">${esc(m.text)}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="deleteMemo('${m.id}')">刪除</button>
+    </div>`).join('')}
+  ${!db.memos.length?'<div style="color:var(--text3);font-size:13px;padding:10px">還沒有備忘</div>':''}`;
+}
 
-      // focus chips for go lanes
-      if (isGo) {
-        const chip = document.createElement('div');
-        chip.className = 'focus-chip';
-        chip.textContent = `${p.name} › ${l.name}`;
-        chip.title = l.detail || '';
-        focusChips.appendChild(chip);
-      }
+// ─── SETTINGS ───
+function pageSettings(){
+  return `
+  <div class="page-header"><div class="page-title">設定</div></div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-weight:700;margin-bottom:12px">雲端同步</div>
+    <div class="fg"><label>Apps Script URL</label>
+      <input type="url" id="apiInp" placeholder="https://script.google.com/..." value="${esc(db.apiUrl||'')}">
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-amber btn-sm" onclick="saveApiUrl()">儲存網址</button>
+      <button class="btn btn-sm btn-ghost" onclick="pullSync()">↻ 從雲端拉取</button>
+    </div>
+  </div>
+  <div class="card">
+    <div style="font-weight:700;margin-bottom:8px;color:var(--rose)">危險</div>
+    <button class="btn btn-rose btn-sm" onclick="if(confirm('確定清除？'))clearAll()">清除所有資料</button>
+  </div>`;
+}
+function saveApiUrl(){ db.apiUrl=document.getElementById('apiInp').value.trim(); save(); toast('✓ 已儲存'); }
+function clearAll(){ localStorage.removeItem(KEY); location.reload(); }
+async function pullSync(){
+  if(!db.apiUrl){alert('請先設定URL');return;}
+  try{
+    const r = await new Promise((res,rej)=>{
+      const cb='_gc'+Date.now(); window[cb]=d=>{delete window[cb];res(d);};
+      const s=document.createElement('script');
+      s.onerror=()=>rej(new Error('error'));
+      s.src=db.apiUrl+'?action=getAll&callback='+cb+'&t='+Date.now();
+      setTimeout(()=>rej(new Error('timeout')),15000);
+      document.head.appendChild(s);
     });
+    if(r&&!r.error){ Object.assign(db,r); saveDB(); renderAll(); toast('✓ 已從雲端載入'); }
+  }catch(e){ toast('❌ 拉取失敗'); }
+}
+
+// ═══════════════════════════════
+// TASK ACTIONS
+// ═══════════════════════════════
+function markDone(id){
+  const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
+  t.status='done'; save(); renderAll(); toast('✅ 完成！');
+}
+function setStatus(id,status){
+  const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
+  t.status=status; save(); renderAll();
+}
+function openTaskModal(id){
+  const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
+  const unlocked=isUnlocked(t);
+  const deps=(t.blockedBy||[]).map(bid=>{
+    const dep=db.weekPlans.find(x=>x.id===bid);
+    return dep?`<span style="color:var(--rose)">${esc(dep.text)}</span>`:'?';
   });
-
-  if (!anyGo) goList.innerHTML = '<div style="color:var(--muted);font-size:17px;padding:8px 0">目前沒有可推進的任務線</div>';
-  if (!anyWait) waitList.innerHTML = '<div style="color:var(--muted);font-size:17px;padding:8px 0">沒有等待中的任務線</div>';
-  if (!anyGo) focusChips.innerHTML = '<span class="focus-empty">沒有可推進的任務</span>';
-}
-
-function quickToggleLane(pid, lid) {
-  const p = projects.find(x => x.id === pid);
-  const l = p.lanes.find(x => x.id === lid);
-  l.status = l.status === 'go' ? 'wait' : 'go';
-  p.updatedAt = new Date().toISOString();
-  renderAll();
-  toast(l.status === 'go' ? '已標記為可推進 ▶' : '已移至等待中 ⏸');
-}
-
-// ── PROJECTS ──
-function renderProjects() {
-  const grid = document.getElementById('projectsGrid');
-  if (projects.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>還沒有專案<br>點右上角「新增專案」開始</p></div>`;
-    return;
-  }
-
-  const openCards = new Set();
-  document.querySelectorAll('.pcard-body.open').forEach(b => openCards.add(b.id.replace('pb-','')));
-
-  grid.innerHTML = '';
-  projects.forEach(p => {
-    const goLanes = p.lanes.filter(l => l.status === 'go');
-    const waitLanes = p.lanes.filter(l => l.status === 'wait');
-    const hasUrgent = p.lanes.length > 0 && goLanes.length === 0;
-
-    const card = document.createElement('div');
-    card.className = `pcard ${hasUrgent && waitLanes.length > 0 ? 'all-waiting' : goLanes.length > 0 ? '' : ''}`;
-    card.id = `pc-${p.id}`;
-
-    const laneHtml = p.lanes.map(l => `
-      <div class="lane-item ${l.status}" id="li-${p.id}-${l.id}">
-        <button class="lane-status-btn" onclick="toggleLane('${p.id}','${l.id}')">
-          ${l.status === 'go' ? '▶ GO' : '⏸ 等待'}
-        </button>
-        <div class="lane-content">
-          <div class="lane-name">${esc(l.name)}</div>
-          ${l.detail ? `<div class="lane-detail">${esc(l.detail)}</div>` : ''}
-          ${l.status === 'wait' && l.waitReason ? `<div class="lane-wait-reason">等：${esc(l.waitReason)}</div>` : ''}
-        </div>
-        ${l.eta ? `<div class="lane-eta">⏱ ${esc(l.eta)}</div>` : ''}
-        <button class="lane-edit-btn" onclick="openEditLane('${p.id}','${l.id}')">✎</button>
-        <button class="icon-btn del" style="width:22px;height:22px;font-size:14px" onclick="deleteLane('${p.id}','${l.id}')">✕</button>
+  showModal(`
+    <div class="modal-title">編輯任務</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+      <span class="line-badge line-${t.line}">${lineName(t.line)}</span>
+      <span class="mono" style="font-size:11px;color:var(--text3)">W${t.week}</span>
+      ${!unlocked?`<span style="font-size:11px;color:var(--rose)">🔒 被擋住</span>`:''}
+    </div>
+    ${deps.length?`<div style="font-size:11px;margin-bottom:12px">需先完成：${deps.join('、')}</div>`:''}
+    <div class="fg"><label>任務名稱</label>
+      <input type="text" id="ttitle" value="${esc(t.text)}">
+    </div>
+    <div style="margin-bottom:12px">
+      <label>狀態</label>
+      <div class="status-sel">
+        ${['done','current','upcoming'].map(s=>`
+          <button class="status-opt${t.status===s?' active-'+s:''}" onclick="setStatus('${id}','${s}');closeModal()">${statusLabel(s)}</button>
+        `).join('')}
       </div>
-    `).join('');
-
-    card.innerHTML = `
-      <div class="pcard-head" onclick="toggleCard('${p.id}')">
-        <div style="flex:1">
-          <div class="pname">${esc(p.name)}</div>
-          <div class="pmeta">${goLanes.length} 可推進 · ${waitLanes.length} 等待 · ${timeAgo(p.updatedAt)}</div>
-        </div>
-        <div class="lane-pills">
-          ${goLanes.slice(0,3).map(l => `<span class="lpill go">${esc(l.name)}</span>`).join('')}
-          ${waitLanes.slice(0,2).map(l => `<span class="lpill wait">${esc(l.name)}</span>`).join('')}
-        </div>
-        <button class="icon-btn del" style="margin-left:8px" onclick="deleteProject(event,'${p.id}')">✕</button>
-      </div>
-      <div class="pcard-body ${openCards.has(p.id) ? 'open' : ''}" id="pb-${p.id}">
-        <div class="pcard-inner">
-          <div class="field-block">
-            <div class="flabel">📍 目前進度 / 下一步</div>
-            <textarea class="fld" placeholder="做到哪了？下一步？" oninput="updatePField('${p.id}','progress',this.value)">${esc(p.progress)}</textarea>
-          </div>
-          <div class="field-block">
-            <div class="flabel">⚠️ 待解決問題</div>
-            <textarea class="fld" placeholder="卡住的問題..." oninput="updatePField('${p.id}','issues',this.value)">${esc(p.issues)}</textarea>
-          </div>
-          <div class="field-block">
-            <div class="flabel">💭 思路 / 備忘</div>
-            <textarea class="fld" placeholder="決策原因、注意事項..." oninput="updatePField('${p.id}','thoughts',this.value)">${esc(p.thoughts)}</textarea>
-          </div>
-          <div class="field-block">
-            <div class="flabel">📁 檔案位置</div>
-            <textarea class="fld" placeholder="/Users/you/project/src&#10;一行一個路徑" oninput="updatePField('${p.id}','filePaths',this.value)">${esc(p.filePaths)}</textarea>
-          </div>
-          <div class="field-block full lanes-section">
-            <div class="lanes-header">
-              <div class="flabel">⚡ 任務線</div>
-              <button class="add-btn" style="font-size:14px;padding:5px 12px" onclick="openAddLane('${p.id}')">＋ 新增任務線</button>
-            </div>
-            <div class="lanes-list">
-              ${laneHtml}
-              ${p.lanes.length === 0 ? '<div style="color:var(--muted);font-size:17px;padding:6px 0">還沒有任務線，點上方按鈕新增</div>' : ''}
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
+    </div>
+    <div class="fg"><label>備注</label>
+      <textarea id="tnote">${esc(t.note||'')}</textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-rose btn-sm" onclick="deleteTask('${id}')">刪除</button>
+      <button class="btn" onclick="closeModal()">關閉</button>
+      <button class="btn btn-amber" onclick="saveTaskEdit('${id}')">儲存</button>
+    </div>`);
+}
+function saveTaskEdit(id){
+  const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
+  const title=document.getElementById('ttitle').value.trim();
+  if(!title){toast('任務名稱不能空白');return;}
+  t.text=title;
+  t.note=document.getElementById('tnote').value.trim();
+  save();closeModal();renderAll();toast('✓ 已儲存');
+}
+function saveTaskNote(id){
+  const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
+  t.note=document.getElementById('tnote').value.trim();
+  save();closeModal();renderPage();toast('✓ 已儲存');
+}
+function deleteTask(id){
+  if(!confirm('刪除這個任務？'))return;
+  db.weekPlans=db.weekPlans.filter(t=>t.id!==id);
+  save();closeModal();renderAll();toast('已刪除');
+}
+function openAddTask(line){
+  showModal(`
+    <div class="modal-title">新增任務</div>
+    <div class="fg"><label>任務內容</label><input type="text" id="ntText" placeholder="要做的事..."></div>
+    <div class="fg"><label>週次</label><input type="number" id="ntWeek" value="${CUR_WEEK}" min="1" max="20"></div>
+    <div class="fg"><label>狀態</label>
+      <select id="ntStatus">
+        <option value="upcoming">⬜ 待辦</option>
+        <option value="current">🔥 進行中</option>
+        <option value="done">✅ 完成</option>
+      </select>
+    </div>
+    <div class="fg"><label>備注</label><textarea id="ntNote"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-amber" onclick="saveNewTask('${line}')">新增</button>
+    </div>`);
+}
+function saveNewTask(line){
+  const text=document.getElementById('ntText').value.trim();
+  const week=parseInt(document.getElementById('ntWeek').value)||CUR_WEEK;
+  const status=document.getElementById('ntStatus').value;
+  const note=document.getElementById('ntNote').value.trim();
+  if(!text){toast('請填寫內容');return;}
+  db.weekPlans.push({id:uid(),line,text,week,status,note,blockedBy:[]});
+  save();closeModal();renderPage();toast('✓ 已新增');
 }
 
-function toggleCard(pid) {
-  document.getElementById(`pb-${pid}`)?.classList.toggle('open');
+// ─── FEEDBACK ───
+function openAddFeedback(){
+  showModal(`
+    <div class="modal-title">記錄老師回饋</div>
+    <div class="fg"><label>日期</label><input type="date" id="fDate" value="${TODAY}"></div>
+    <div class="fg"><label>線別</label>
+      <select id="fLine"><option value="pack">📦 包裝</option><option value="exhibit">🎨 畢展</option></select>
+    </div>
+    <div class="fg"><label>老師說了什麼</label><textarea id="fText" placeholder="回饋內容..."></textarea></div>
+    <div class="fg"><label>→ 我要做什麼（行動）</label><input type="text" id="fAction" placeholder="具體要做的事..."></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-amber" onclick="saveFeedback()">儲存</button>
+    </div>`);
+}
+function saveFeedback(){
+  const text=document.getElementById('fText').value.trim();
+  if(!text){toast('請填寫內容');return;}
+  db.feedbacks.push({id:uid(),date:document.getElementById('fDate').value,line:document.getElementById('fLine').value,text,action:document.getElementById('fAction').value.trim()});
+  save();closeModal();renderPage();toast('✓ 已記錄');
+}
+function deleteFeedback(id){ if(!confirm('刪除？'))return;db.feedbacks=db.feedbacks.filter(f=>f.id!==id);save();renderPage(); }
+
+// ─── VENDOR ───
+function openAddVendor(){
+  showModal(`
+    <div class="modal-title">新增廠商</div>
+    <div class="fg"><label>廠商名稱</label><input type="text" id="vName" placeholder="印刷廠、紙廠..."></div>
+    <div class="fg"><label>用途</label>
+      <select id="vLine"><option value="pack">📦 包裝</option><option value="exhibit">🎨 畢展</option><option value="other">其他</option></select>
+    </div>
+    <div class="fg"><label>聯絡方式</label><input type="text" id="vContact" placeholder="電話、LINE..."></div>
+    <div class="fg"><label>品項/工藝</label><input type="text" id="vProduct" placeholder="UV感光、銀墨、盒型..."></div>
+    <div class="fg"><label>報價</label><input type="text" id="vPrice" placeholder="NT$..."></div>
+    <div class="fg"><label>備注</label><textarea id="vNote"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-amber" onclick="saveVendor()">儲存</button>
+    </div>`);
+}
+function saveVendor(){
+  const name=document.getElementById('vName').value.trim();
+  if(!name){toast('請填廠商名稱');return;}
+  db.vendors.push({id:uid(),name,line:document.getElementById('vLine').value,contact:document.getElementById('vContact').value.trim(),product:document.getElementById('vProduct').value.trim(),price:document.getElementById('vPrice').value.trim(),note:document.getElementById('vNote').value.trim()});
+  save();closeModal();renderPage();toast('✓ 已新增');
+}
+function deleteVendor(id){ if(!confirm('刪除？'))return;db.vendors=db.vendors.filter(v=>v.id!==id);save();renderPage(); }
+
+// ─── MEMO ───
+function openAddMemo(){
+  showModal(`
+    <div class="modal-title">新增備忘</div>
+    <div class="fg"><label>線別（選填）</label>
+      <select id="mLine"><option value="">不分類</option><option value="pack">📦 包裝</option><option value="exhibit">🎨 畢展</option></select>
+    </div>
+    <div class="fg"><label>內容</label><textarea id="mText" placeholder="想法、待辦、任何東西..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-amber" onclick="saveMemo()">儲存</button>
+    </div>`);
+}
+function saveMemo(){
+  const text=document.getElementById('mText').value.trim();
+  if(!text){toast('請填寫內容');return;}
+  db.memos.push({id:uid(),date:TODAY,line:document.getElementById('mLine').value,text});
+  save();closeModal();renderPage();toast('✓ 已記錄');
+}
+function deleteMemo(id){ db.memos=db.memos.filter(m=>m.id!==id);save();renderPage(); }
+
+// ─── DECISION ───
+function openAddDecision(){
+  showModal(`
+    <div class="modal-title">新增待決策</div>
+    <div class="fg"><label>需要決定的事</label><textarea id="dText" placeholder="例：包裝結構選A還是B？"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-rose" onclick="saveDecision()">加入</button>
+    </div>`);
+}
+function saveDecision(){
+  const text=document.getElementById('dText').value.trim();
+  if(!text){toast('請填寫內容');return;}
+  db.decisions.push({id:uid(),text,resolved:false,date:TODAY});
+  save();closeModal();renderPage();toast('✓ 已加入');
+}
+function resolveDecision(id){ const d=db.decisions.find(x=>x.id===id);if(d){d.resolved=true;save();renderPage();toast('✓ 決策完成');} }
+function deleteDecision(id){ db.decisions=db.decisions.filter(d=>d.id!==id);save();renderPage(); }
+
+// ═══════════════════════════════
+// MODAL
+// ═══════════════════════════════
+function showModal(html){
+  let el=document.getElementById('_modal');
+  if(!el){el=document.createElement('div');el.id='_modal';el.className='overlay';document.body.appendChild(el);}
+  el.innerHTML=`<div class="modal">${html}</div>`;
+  el.classList.add('open');
+  el.onclick=e=>{if(e.target===el)closeModal();};
+}
+function closeModal(){
+  const el=document.getElementById('_modal');
+  if(el) el.classList.remove('open');
 }
 
-function updatePField(pid, field, val) {
-  const p = projects.find(x => x.id === pid);
-  if (!p) return;
-  p[field] = val;
-  p.updatedAt = new Date().toISOString();
-  save();
-  updateCounts();
-}
-
-function toggleLane(pid, lid) {
-  const p = projects.find(x => x.id === pid);
-  const l = p.lanes.find(x => x.id === lid);
-  l.status = l.status === 'go' ? 'wait' : 'go';
-  p.updatedAt = new Date().toISOString();
-  renderAll();
-  document.getElementById(`pb-${pid}`)?.classList.add('open');
-}
-
-function deleteLane(pid, lid) {
-  const p = projects.find(x => x.id === pid);
-  p.lanes = p.lanes.filter(x => x.id !== lid);
-  p.updatedAt = new Date().toISOString();
-  renderAll();
-  document.getElementById(`pb-${pid}`)?.classList.add('open');
-  toast('任務線已刪除');
-}
-
-function deleteProject(e, pid) {
-  e.stopPropagation();
-  if (!confirm('確定刪除這個專案？')) return;
-  projects = projects.filter(x => x.id !== pid);
-  renderAll();
-  toast('已刪除');
-}
-
-// ── PROJECT MODAL ──
-function openProjectModal() {
-  document.getElementById('projOverlay').classList.add('open');
-  setTimeout(() => document.getElementById('pNewName').focus(), 50);
-}
-function closeProjModal() {
-  document.getElementById('projOverlay').classList.remove('open');
-  document.getElementById('pNewName').value = '';
-  document.getElementById('pNewDeadline').value = '';
-}
-function createProject() {
-  const name = document.getElementById('pNewName').value.trim();
-  if (!name) { alert('請輸入專案名稱'); return; }
-  const p = {
-    id: uid(), name,
-    deadline: document.getElementById('pNewDeadline').value,
-    progress: '', issues: '', thoughts: '', filePaths: '',
-    lanes: [],
-    updatedAt: new Date().toISOString(),
-  };
-  projects.unshift(p);
-  renderAll();
-  closeProjModal();
-  switchTab('projects');
-  setTimeout(() => { document.getElementById(`pb-${p.id}`)?.classList.add('open'); }, 100);
-  toast('專案已建立！');
-}
-
-// ── LANE MODAL ──
-function selectLaneStatus(s) {
-  laneStatus = s;
-  document.getElementById('lmsGo').className = `lms-btn go ${s === 'go' ? 'sel' : ''}`;
-  document.getElementById('lmsWait').className = `lms-btn wait ${s === 'wait' ? 'sel' : ''}`;
-  document.getElementById('waitReasonGroup').style.display = s === 'wait' ? 'block' : 'none';
-}
-
-function openAddLane(pid) {
-  addingLanePid = pid; editingLane = null;
-  document.getElementById('laneModalTitle').textContent = 'ADD LANE';
-  document.getElementById('lNewName').value = '';
-  document.getElementById('lDetail').value = '';
-  document.getElementById('lWaitReason').value = '';
-  document.getElementById('lEta').value = '';
-  selectLaneStatus('go');
-  document.getElementById('laneOverlay').classList.add('open');
-  setTimeout(() => document.getElementById('lNewName').focus(), 50);
-}
-
-function openEditLane(pid, lid) {
-  const p = projects.find(x => x.id === pid);
-  const l = p.lanes.find(x => x.id === lid);
-  editingLane = { pid, lid }; addingLanePid = null;
-  document.getElementById('laneModalTitle').textContent = 'EDIT LANE';
-  document.getElementById('lNewName').value = l.name;
-  document.getElementById('lDetail').value = l.detail || '';
-  document.getElementById('lWaitReason').value = l.waitReason || '';
-  document.getElementById('lEta').value = l.eta || '';
-  selectLaneStatus(l.status);
-  document.getElementById('laneOverlay').classList.add('open');
-}
-
-function closeLaneModal() {
-  document.getElementById('laneOverlay').classList.remove('open');
-  editingLane = null; addingLanePid = null;
-}
-
-function saveLane() {
-  const name = document.getElementById('lNewName').value.trim();
-  if (!name) { alert('請輸入任務線名稱'); return; }
-  const data = {
-    name,
-    status: laneStatus,
-    detail: document.getElementById('lDetail').value.trim(),
-    waitReason: document.getElementById('lWaitReason').value.trim(),
-    eta: document.getElementById('lEta').value.trim(),
-  };
-  if (editingLane) {
-    const p = projects.find(x => x.id === editingLane.pid);
-    const l = p.lanes.find(x => x.id === editingLane.lid);
-    Object.assign(l, data);
-    p.updatedAt = new Date().toISOString();
-    renderAll();
-    document.getElementById(`pb-${editingLane.pid}`)?.classList.add('open');
-  } else {
-    const p = projects.find(x => x.id === addingLanePid);
-    p.lanes.push({ id: uid(), ...data });
-    p.updatedAt = new Date().toISOString();
-    renderAll();
-    document.getElementById(`pb-${addingLanePid}`)?.classList.add('open');
-  }
-  closeLaneModal();
-  toast('已儲存');
-}
-
-// close overlays on outside click
-['projOverlay','laneOverlay'].forEach(id => {
-  document.getElementById(id).addEventListener('click', e => {
-    if (e.target.id === id) {
-      if (id === 'projOverlay') closeProjModal();
-      else closeLaneModal();
-    }
-  });
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeProjModal(); closeLaneModal(); }
-});
-
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+document.getElementById('topbarDate').textContent = TODAY;
 renderAll();
+if(db.apiUrl){
+  const isEmpty=!db.feedbacks.length&&!db.vendors.length;
+  if(isEmpty) pullSync();
+}
+setInterval(()=>{if(db.apiUrl)pushSync();},600000);
 </script>
 </body>
 </html>
