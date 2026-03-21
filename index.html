@@ -15,7 +15,7 @@
   --done:#0a8a68;--current:#c47a00;--blocked:#d03060;--upcoming:#9a9cb8;
   --r:8px;
 }
-body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;font-size:15px}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none}
 .mono{font-family:'DM Mono',monospace}
 input,select,textarea{font-family:'Noto Sans TC',sans-serif;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:8px 12px;font-size:15px;width:100%;outline:none;transition:border .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--amber)}
@@ -121,43 +121,40 @@ label{font-size:12px;color:var(--text2);font-weight:600;display:block;margin-bot
 
 /* Mobile */
 @media(max-width:640px){
-  /* 解除固定高度，改成可滑動 */
-  .app{display:block}
-  .sidebar{width:100%;height:58px;flex-direction:row;justify-content:space-around;position:fixed;bottom:0;left:0;right:0;z-index:50;border-top:1px solid var(--border);border-right:none;border-bottom:none;padding:0 4px;gap:0;background:var(--bg2)}
-  .sib{width:44px;height:44px;border-radius:10px;font-size:20px}
-  .main{display:block;padding-bottom:72px;min-height:100vh;overflow:visible}
-  .topbar{height:46px;padding:0 14px;position:sticky;top:0;z-index:40;background:var(--bg2)}
-  .topbar-title{font-size:15px}
-  .page{padding:14px 12px;font-size:15px;height:auto;overflow:visible}
-  .page-header{margin-bottom:14px;flex-wrap:wrap;gap:8px}
+  .app{flex-direction:column}
+  .sidebar{width:100%;height:56px;flex-direction:row;justify-content:space-around;position:fixed;bottom:0;left:0;right:0;z-index:50;border-top:1px solid var(--border);border-right:none;border-bottom:none;padding:0 4px;gap:0}
+  .sib{width:44px;height:44px;border-radius:10px;font-size:18px}
+  .main{padding-bottom:56px;height:100vh}
+  .page{padding:16px 14px;font-size:15px}
+  .page-header{margin-bottom:16px}
   .page-title{font-size:17px}
-  /* 卡片 */
-  .card{padding:14px;margin-bottom:10px}
+  .topbar{height:44px;padding:0 14px}
+  .topbar-title{font-size:15px}
+  .overlay{align-items:flex-end;padding:0}
+  .modal{border-radius:16px 16px 0 0;max-width:100%;max-height:92vh;padding:20px 16px}
+  .modal-title{font-size:16px;margin-bottom:18px}
   .focus-card{padding:14px;margin-bottom:10px!important}
   .focus-text{font-size:15px}
-  /* 任務列 */
+  /* 卡片間距加大 */
+  .card{padding:14px;margin-bottom:10px}
+  /* 任務列：文字換行，按鈕縮到右邊 */
   .week-task-row{padding:12px 10px;gap:8px;flex-wrap:wrap;align-items:flex-start}
   .week-task-text{font-size:14px;flex:1;min-width:0;line-height:1.4}
   .memo-text{font-size:14px;line-height:1.6}
   .memo-row{padding:14px;margin-bottom:8px}
   .line-badge{font-size:11px;padding:3px 9px;flex-shrink:0}
-  /* 防止 iOS 放大輸入欄位 */
-  input,select,textarea{font-size:16px !important;min-height:44px !important}
-  /* 按鈕加大點擊區 */
-  .btn-sm{padding:7px 14px;font-size:12px;min-height:36px}
-  .btn{padding:10px 16px;min-height:44px}
-  .btn-amber,.btn-teal,.btn-rose{min-height:44px}
+  input,select,textarea{font-size:16px !important}
+  /* 按鈕手機加大點擊區 */
+  .btn-sm{padding:7px 13px;font-size:12px}
+  .btn{padding:9px 16px}
   .status-sel{gap:6px}
-  .status-opt{padding:8px 14px;font-size:13px;min-height:40px}
+  .status-opt{padding:7px 13px;font-size:12px}
   .modal-footer{gap:8px;margin-top:20px}
-  .modal-footer button{padding:12px 16px;font-size:14px;flex:1;min-height:48px}
-  /* modal 從底部滑出 */
-  .overlay{align-items:flex-end;padding:0}
-  .modal{border-radius:18px 18px 0 0;max-width:100%;max-height:92vh;padding:20px 16px 36px}
-  .modal-title{font-size:16px;margin-bottom:18px}
+  .modal-footer button{padding:11px 16px;font-size:13px;flex:1}
+  /* week-task-row 的按鈕群不要被擠掉 */
   .week-task-row > div[onclick]{flex-shrink:0}
+  /* 任務樹子項縮排小一點 */
   .task-children{padding-left:8px}
-  .week-plan{margin-bottom:16px}
 }
 @media(min-width:641px) and (max-width:900px){
   .sidebar{width:44px}
@@ -172,8 +169,11 @@ label{font-size:12px;color:var(--text2);font-weight:600;display:block;margin-bot
   <div class="main">
     <div class="topbar">
       <div class="topbar-title" id="topbarTitle">畢製追蹤</div>
+      <div id="topbarUser" style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace"></div>
       <div class="mono" style="font-size:11px;color:var(--text3)" id="topbarDate"></div>
+      <div id="lockBadge" style="display:none;font-size:10px;padding:3px 8px;border-radius:10px;font-family:'DM Mono',monospace"></div>
       <button class="btn btn-sm btn-ghost" onclick="openWeeklyReport()" title="產生週報給 Claude">📋</button>
+      <button class="btn btn-sm btn-ghost" onclick="exportTeamData()" title="匯出組員版資料">👥</button>
       <button class="btn btn-sm" onclick="manualSave()">💾</button>
     </div>
     <div class="page" id="pageContent"></div>
@@ -186,12 +186,15 @@ label{font-size:12px;color:var(--text2);font-weight:600;display:block;margin-bot
 // CONFIG
 // ═══════════════════════════════
 const API_URL = '';
-const KEY = 'grad_v5';
+const KEY = 'grad_v6';
 const TODAY = new Date().toISOString().slice(0,10);
 const CUR_WEEK = getWeekNum(TODAY);
 
+// 課表無課週（115學年）
+const NO_CLASS_WEEKS = [2, 7, 10]; // w2=02/28清明連假前, w7=04/04清明, w10=04/25
+
 function getWeekNum(dateStr){
-  const start = new Date('2025-03-19'); // 學期開始
+  const start = new Date('2026-02-21'); // 115學年第一週，週六02/21
   const d = new Date(dateStr);
   return Math.ceil((d - start) / (7*24*60*60*1000)) + 1;
 }
@@ -210,36 +213,77 @@ function defDB(){
     apiUrl: API_URL,
     // 週計畫
     weekPlans: [
-      // 包裝線
-      {id:'w1p1',week:1,line:'pack',text:'確定精露組產品結構（不回頭）',status:'current',note:''},
+      // ── 包裝線（玫瑰品牌 · 個人畢製）──
+      // 目標：包裝設計定稿送印，截止 5/10
+      {id:'w1p1',week:1,line:'pack',text:'確定產品結構：精露噴霧、精露飲品、花醬、禮盒（不回頭）',status:'current',note:'品牌核心：屏東日照→花青素→濃郁花色'},
       {id:'w1p2',week:1,line:'pack',text:'畫5張精露噴霧草稿（植物圖鑑風格）',status:'upcoming',note:'',blockedBy:[]},
-      {id:'w2p1',week:2,line:'pack',text:'Moodboard完成，與老師確認視覺方向',status:'upcoming',note:'',blockedBy:['w1p1']},
+      {id:'w2p1',week:2,line:'pack',text:'Moodboard完成，與老師確認視覺方向',status:'upcoming',note:'白色＋玫瑰紅＋銀墨，UV感光油墨概念',blockedBy:['w1p1']},
       {id:'w2p2',week:2,line:'pack',text:'LOGO第一版草稿',status:'upcoming',note:'',blockedBy:['w1p2']},
       {id:'w3p1',week:3,line:'pack',text:'瓶身標籤設計提案2-3版',status:'upcoming',note:'',blockedBy:['w2p1','w2p2']},
-      {id:'w4p1',week:4,line:'pack',text:'單品包裝設計，老師review',status:'upcoming',note:'',blockedBy:['w3p1']},
-      {id:'w5p1',week:5,line:'pack',text:'禮盒設計（若做）',status:'upcoming',note:'',blockedBy:['w4p1']},
-      {id:'w6p1',week:6,line:'pack',text:'全部定稿，送印',status:'upcoming',note:'',blockedBy:['w5p1']},
+      {id:'w4p1',week:4,line:'pack',text:'單品包裝設計定稿，老師review',status:'upcoming',note:'',blockedBy:['w3p1']},
+      {id:'w5p1',week:5,line:'pack',text:'禮盒設計（蛋捲＋花茶組合）',status:'upcoming',note:'',blockedBy:['w4p1']},
+      {id:'w5p2',week:5,line:'pack',text:'確認UV感光油墨廠商＋詢價',status:'upcoming',note:'',blockedBy:['w4p1']},
+      {id:'w6p1',week:6,line:'pack',text:'全部包裝定稿，送印',status:'upcoming',note:'⚠ 5/10截止往前推，最晚w6送出',blockedBy:['w5p1','w5p2']},
       {id:'w7p1',week:7,line:'pack',text:'收件確認印刷品質',status:'upcoming',note:'',blockedBy:['w6p1']},
-      // 擺攤線
-      {id:'s1a',week:1,line:'stall',text:'確定攤位品牌概念（名稱/主色/調性）',status:'upcoming',note:'',blockedBy:[]},
-      {id:'s2a',week:2,line:'stall',text:'攤位平面配置草圖（動線/擺設）',status:'upcoming',note:'',blockedBy:['s1a']},
-      {id:'s2b',week:2,line:'stall',text:'宣傳影片腳本完成',status:'upcoming',note:'',blockedBy:['s1a']},
-      {id:'s3a',week:3,line:'stall',text:'影片拍攝（協作組員）',status:'upcoming',note:'',blockedBy:['s2b']},
-      {id:'s3b',week:3,line:'stall',text:'道具／器材清單確認＋採購',status:'upcoming',note:'',blockedBy:['s2a']},
-      {id:'s4a',week:4,line:'stall',text:'影片剪輯輸出',status:'upcoming',note:'',blockedBy:['s3a']},
-      {id:'s4b',week:4,line:'stall',text:'攤位視覺設計（banner/標牌）',status:'upcoming',note:'',blockedBy:['s2a']},
-      {id:'s5a',week:5,line:'stall',text:'攤位道具製作／到位確認',status:'upcoming',note:'',blockedBy:['s3b','s4b']},
-      {id:'s6a',week:6,line:'stall',text:'影片上傳測試、播放設備確認',status:'upcoming',note:'',blockedBy:['s4a']},
-      {id:'s7a',week:7,line:'stall',text:'現場布置演練',status:'upcoming',note:'',blockedBy:['s5a','s6a']},
-      // 畢展線
-      {id:'w1e1',week:1,line:'exhibit',text:'問老師海報/邀卡要加什麼（本週最重要）',status:'current',note:'這個不解決整條印刷線卡死'},
-      {id:'w2e1',week:2,line:'exhibit',text:'海報/邀卡定稿',status:'upcoming',note:'',blockedBy:['w1e1']},
-      {id:'w3e1',week:3,line:'exhibit',text:'發包印刷',status:'upcoming',note:'',blockedBy:['w2e1']},
-      {id:'w3e2',week:3,line:'exhibit',text:'開始場地規劃（動線/攤位）',status:'upcoming',note:''},
-      {id:'w4e1',week:4,line:'exhibit',text:'大型輸出尺寸確認',status:'upcoming',note:'',blockedBy:['w3e1']},
-      {id:'w4e2',week:4,line:'exhibit',text:'場地動線確認',status:'upcoming',note:'',blockedBy:['w3e2']},
-      {id:'w6e1',week:6,line:'exhibit',text:'所有印刷收件',status:'upcoming',note:'',blockedBy:['w3e1']},
-      {id:'w7e1',week:7,line:'exhibit',text:'布展準備',status:'upcoming',note:'',blockedBy:['w6e1','w4e2']},
+
+      // ── 畢展線（印刷組統籌）──
+      // 海報完稿4/17、邀請卡4/19、小卡5/19、畢展板5/11
+      {id:'e1a',week:1,line:'exhibit',text:'問老師：邀請名單哪組負責、幾人？海報張貼點？',status:'current',note:'3/22明天要問'},
+      {id:'e1b',week:1,line:'exhibit',text:'邀請卡工藝方向向老師確認（方案A/B/C）',status:'current',note:'方案C光柵欄動畫製作週期最長，要提前詢價'},
+      {id:'e1c',week:1,line:'exhibit',text:'畢展板尺寸確認（展間面積/每組分配面積/桌子尺寸）',status:'current',note:''},
+      {id:'e2a',week:2,line:'exhibit',text:'海報排版細節調整完成',status:'upcoming',note:'初版已完成',blockedBy:['e1a']},
+      {id:'e3a',week:3,line:'exhibit',text:'海報完稿 ✦ 截止4/17（四）',status:'upcoming',note:'完稿→4/19送印→4/23取件',blockedBy:['e2a']},
+      {id:'e3b',week:3,line:'exhibit',text:'邀請卡版面設計執行',status:'upcoming',note:'',blockedBy:['e1b']},
+      {id:'e3c',week:3,line:'exhibit',text:'邀請卡詢價（含工藝）',status:'upcoming',note:'',blockedBy:['e1b']},
+      {id:'e4a',week:4,line:'exhibit',text:'邀請卡完稿 ✦ 截止4/19（六）',status:'upcoming',note:'完稿→4/21送印→4/23取件',blockedBy:['e3b','e3c']},
+      {id:'e4b',week:4,line:'exhibit',text:'畢展板規範文件製作＋公告全班',status:'upcoming',note:'4/27開放上傳',blockedBy:['e1c']},
+      {id:'e4c',week:4,line:'exhibit',text:'海報/邀請卡送印對接＋取件',status:'upcoming',note:'',blockedBy:['e3a','e4a']},
+      {id:'e5a',week:5,line:'exhibit',text:'畢展板第一輪收稿截止 ✦ 5/4（日）',status:'upcoming',note:'給全班7天設計時間',blockedBy:['e4b']},
+      {id:'e5b',week:5,line:'exhibit',text:'檔案檢查：像素尺寸＋有無繳交，發退回通知',status:'upcoming',note:'5/5當天發退回通知',blockedBy:['e5a']},
+      {id:'e6a',week:6,line:'exhibit',text:'畢展板第二輪修改截止 ✦ 5/8（四）',status:'upcoming',note:'超過不保證能送印',blockedBy:['e5b']},
+      {id:'e6b',week:6,line:'exhibit',text:'作品意念小卡模板設計＋蒐集全班文字',status:'upcoming',note:'',blockedBy:[]},
+      {id:'e6c',week:6,line:'exhibit',text:'畢展板詢價（尺寸/材質/數量）',status:'upcoming',note:'三折式KT板或PP板',blockedBy:['e1c']},
+      {id:'e7a',week:7,line:'exhibit',text:'畢展板最終確認＋送印 ✦ 5/11（一）',status:'upcoming',note:'',blockedBy:['e6a','e6c']},
+      {id:'e11a',week:11,line:'exhibit',text:'作品意念小卡完稿 ✦ 5/19（一）',status:'upcoming',note:'完稿→5/21送印→5/22取件',blockedBy:['e6b']},
+      {id:'e12a',week:12,line:'exhibit',text:'展場布置：海報張貼＋小卡擺放＋識別卡發放',status:'upcoming',note:'畢展日 5/23',blockedBy:['e11a','e7a']},
+
+      // ── 擺攤線（咖啡攤位）──
+      // 攤位日 5/23，空間 60×120cm
+      {id:'s1a',week:1,line:'stall',text:'問老師：攤位確切空間尺寸',status:'current',note:'3/22明天要問'},
+      {id:'s1b',week:1,line:'stall',text:'確定品牌名稱（三人討論）',status:'current',note:''},
+      {id:'s2a',week:2,line:'stall',text:'攤位平面配置草圖（動線/生豆區/手沖區/販售區）',status:'upcoming',note:'桌面60×120cm',blockedBy:['s1a']},
+      {id:'s2b',week:2,line:'stall',text:'影片腳本完成',status:'upcoming',note:'開場烘豆→生豆挑選→香氣時刻→手沖→LOGO淡入',blockedBy:['s1b']},
+      {id:'s3a',week:3,line:'stall',text:'聯繫A同學確認拍攝日期（以他為主）',status:'upcoming',note:'拍攝地：A同學咖啡工作室',blockedBy:['s2b']},
+      {id:'s3b',week:3,line:'stall',text:'道具/器材清單確認＋採購（桌布/植栽/小黑板/立牌）',status:'upcoming',note:'',blockedBy:['s2a']},
+      {id:'s4a',week:4,line:'stall',text:'形象影片拍攝（A同學工作室）',status:'upcoming',note:'補光燈×2自備，iPhone拍攝',blockedBy:['s3a']},
+      {id:'s4b',week:4,line:'stall',text:'攤位視覺設計（背板/價目表/生豆標示卡）',status:'upcoming',note:'手繪風插圖＋極簡',blockedBy:['s2a']},
+      {id:'s4c',week:4,line:'stall',text:'背板方案確認（布幔/木紋板/牛皮紙/原牆）',status:'upcoming',note:'建議方案A棉麻布幔',blockedBy:['s1a']},
+      {id:'s5a',week:5,line:'stall',text:'影片剪輯完成輸出',status:'upcoming',note:'確認剪輯負責人',blockedBy:['s4a']},
+      {id:'s5b',week:5,line:'stall',text:'物料確認完成，送印（背板/價目表）',status:'upcoming',note:'',blockedBy:['s4b','s4c']},
+      {id:'s6a',week:6,line:'stall',text:'影片上傳測試、播放設備確認',status:'upcoming',note:'螢幕自備',blockedBy:['s5a']},
+      {id:'s7a',week:7,line:'stall',text:'IG預熱宣傳開始（烘豆畫面/神秘感）',status:'upcoming',note:'確認IG帳號歸屬',blockedBy:['s1b']},
+      {id:'s10a',week:10,line:'stall',text:'試擺攤位演練（全員）',status:'upcoming',note:'',blockedBy:['s5b','s6a']},
+      {id:'s11a',week:11,line:'stall',text:'形象影片IG發布',status:'upcoming',note:'',blockedBy:['s5a']},
+      {id:'s12a',week:12,line:'stall',text:'展前2天提醒限動＋即時記錄',status:'upcoming',note:'5/21~5/23',blockedBy:['s7a']},
+      // ── 體驗規劃 ──
+      {id:'sop1',week:3,line:'stall',text:'現場 SOP 確認：聞香免費→選豆現烘→帶走',status:'upcoming',note:'每組約10分鐘，同時只能服務一組',blockedBy:[]},
+      {id:'sop2',week:3,line:'stall',text:'定價方案確認（全員討論，A同學確認成本）',status:'upcoming',note:'建議方案B：買豆送手沖；只喝咖啡 $50',blockedBy:[]},
+      {id:'sop3',week:4,line:'stall',text:'確認手沖負責人（A烘豆，誰手沖？）',status:'upcoming',note:'B同學？先生？需提前決定',blockedBy:['sop2']},
+      {id:'sop4',week:4,line:'stall',text:'排隊方案確認（建議號碼牌制）',status:'upcoming',note:'客人抽號後可逛展，到號再回來',blockedBy:['sop1']},
+      {id:'sop5',week:5,line:'stall',text:'製作號碼牌＋等待時間告示牌',status:'upcoming',note:'手寫即可',blockedBy:['sop4']},
+      {id:'sop6',week:5,line:'stall',text:'設計沖泡建議小卡（隨豆附贈）',status:'upcoming',note:'',blockedBy:[]},
+      // ── 突發應對備案 ──
+      {id:'bk1',week:11,line:'stall',text:'展前一天：烘豆機試運作確認',status:'upcoming',note:'故障備案：改純販售＋手沖，取消現烘',blockedBy:[]},
+      {id:'bk2',week:9,line:'stall',text:'備用熟豆準備（請A同學提前烘一批）',status:'upcoming',note:'',blockedBy:[]},
+      {id:'bk3',week:9,line:'stall',text:'確認緊急代班聯絡人（A同學工作室夥伴？）',status:'upcoming',note:'',blockedBy:[]},
+      {id:'bk4',week:11,line:'stall',text:'備用零錢準備 $500＋確認行動支付方式',status:'upcoming',note:'LINE Pay / 街口？攤位上要標示清楚',blockedBy:[]},
+      {id:'bk5',week:11,line:'stall',text:'影片存到兩個裝置（手機＋備用）',status:'upcoming',note:'',blockedBy:[]},
+      // ── 當天 checklist ──
+      {id:'day1',week:12,line:'stall',text:'✓ 烘豆機正常運作',status:'upcoming',note:'',blockedBy:[]},
+      {id:'day2',week:12,line:'stall',text:'✓ 備用熟豆已帶',status:'upcoming',note:'',blockedBy:[]},
+      {id:'day3',week:12,line:'stall',text:'✓ 影片存兩個裝置',status:'upcoming',note:'',blockedBy:[]},
+      {id:'day4',week:12,line:'stall',text:'✓ 零錢備用金帶了',status:'upcoming',note:'',blockedBy:[]},
+      {id:'day5',week:12,line:'stall',text:'✓ 所有人知道基本流程',status:'upcoming',note:'最低人力：A烘豆+手沖、1人接待收費',blockedBy:[]},
     ],
     // 老師回饋
     feedbacks: [],
@@ -251,6 +295,17 @@ function defDB(){
     decisions: [],
     // 其他作業
     assignments: [],
+    // 專案檔案連結（每個線別各自管理）
+    projectFiles: {
+      pack: [],
+      exhibit: [],
+      stall: [],
+    },
+    // 使用者名稱（區分誰在編輯）
+    userName: '',
+    // 組員公告（同步到組員版）
+    announce: '',
+    announceUpdatedAt: '',
   };
 }
 
@@ -288,6 +343,82 @@ function manualSave(){
 }
 let _debTimer = null;
 function save(){ saveDB(); clearTimeout(_debTimer); _debTimer = setTimeout(()=>{ if(db.apiUrl) pushSync(); }, 3000); }
+
+// ── 鎖定機制 ──
+let _lockCheckTimer = null;
+async function acquireLock(){
+  if(!db.apiUrl) return true; // 無雲端直接允許
+  const user = db.userName||'未知使用者';
+  try{
+    const r = await fetch(db.apiUrl,{method:'POST',body:JSON.stringify({action:'lock',data:{user}})});
+    const res = await r.json();
+    if(res.ok){ updateLockBadge(true,user); return true; }
+    else{
+      toast('⚠️ '+res.user+' 正在編輯，請稍後再試',4000);
+      return false;
+    }
+  }catch(e){ return true; } // 網路失敗就允許繼續
+}
+async function releaseLock(){
+  if(!db.apiUrl) return;
+  const user = db.userName||'未知使用者';
+  try{
+    await fetch(db.apiUrl,{method:'POST',body:JSON.stringify({action:'unlock',data:{user}})});
+    updateLockBadge(false);
+  }catch(e){}
+}
+function updateLockBadge(locked,user=''){
+  const el=document.getElementById('lockBadge');
+  if(!el) return;
+  if(locked){
+    el.style.display='block';
+    el.textContent='🔒 編輯中';
+    el.style.background='rgba(240,184,64,.15)';
+    el.style.color='var(--amber)';
+    el.style.border='1px solid rgba(240,184,64,.3)';
+  } else {
+    el.style.display='none';
+  }
+}
+async function checkLockStatus(){
+  if(!db.apiUrl) return;
+  try{
+    const cb='_lk'+Date.now(); 
+    const r = await new Promise((res,rej)=>{
+      window[cb]=d=>{delete window[cb];res(d);};
+      const s=document.createElement('script');
+      s.onerror=()=>rej();
+      s.src=db.apiUrl+'?action=getLock&callback='+cb+'&t='+Date.now();
+      setTimeout(()=>rej(),5000);
+      document.head.appendChild(s);
+    });
+    const lockEl=document.getElementById('lockBadge');
+    if(!lockEl) return;
+    if(r.locked && r.user!==(db.userName||'')){
+      lockEl.style.display='block';
+      lockEl.textContent='🔒 '+r.user+' 編輯中';
+      lockEl.style.background='rgba(208,48,96,.1)';
+      lockEl.style.color='var(--rose)';
+      lockEl.style.border='1px solid rgba(208,48,96,.2)';
+    } else {
+      lockEl.style.display='none';
+    }
+  }catch(e){}
+}
+
+// ── 組員更新單一任務狀態（輕量，不送整包）──
+async function syncTaskStatus(taskId, status, note){
+  if(!db.apiUrl) return;
+  const user = db.userName||'未知使用者';
+  try{
+    const resp = await fetch(db.apiUrl,{method:'POST',body:JSON.stringify({
+      action:'updateTaskStatus',
+      data:{id:taskId, status, note, user}
+    })});
+    const r = await resp.json();
+    if(!r.ok) console.warn('syncTaskStatus failed:',r.error);
+  }catch(e){ console.warn(e); }
+}
 
 // ═══════════════════════════════
 // UTILS
@@ -359,7 +490,6 @@ function renderPage(){
     case 'memo':        el.innerHTML = pageMemo(); break;
     case 'settings':    el.innerHTML = pageSettings(); break;
   }
-  window.scrollTo(0,0);
 }
 
 // ─── TODAY ───
@@ -367,9 +497,10 @@ function pageToday(){
   const curTasks = db.weekPlans.filter(t=>t.status==='current');
   const unlockedTasks = db.weekPlans.filter(t=>t.status==='upcoming'&&isUnlocked(t));
   const blockedTasks = db.weekPlans.filter(t=>t.status==='upcoming'&&!isUnlocked(t));
-  const wLeft5_10 = weeksLeft('2025-05-10');
-  const wLeft5_23 = weeksLeft('2025-05-23');  const doneCount = db.weekPlans.filter(t=>t.status==='done').length;
+  const wLeft5_10 = weeksLeft('2026-05-10');
+  const wLeft5_23 = weeksLeft('2026-05-23');  const doneCount = db.weekPlans.filter(t=>t.status==='done').length;
   const total = db.weekPlans.length;
+  const isNoClass = NO_CLASS_WEEKS.includes(CUR_WEEK);
 
   // current week tasks
   const thisWeek = db.weekPlans.filter(t=>t.week===CUR_WEEK||t.status==='current');
@@ -393,6 +524,8 @@ function pageToday(){
         <div style="height:4px;background:var(--bg3);border-radius:2px;margin-top:6px"><div style="height:4px;background:var(--teal);border-radius:2px;width:${Math.round(doneCount/total*100)}%"></div></div>
       </div>
     </div>
+
+    ${isNoClass?`<div style="background:rgba(96,168,240,.1);border:1px solid rgba(96,168,240,.3);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:18px">🚀</span><div><div style="font-size:12px;font-weight:700;color:var(--blue)">本週無課！衝刺週</div><div style="font-size:11px;color:var(--text3)">W${CUR_WEEK} 空出來了，適合推進卡住的任務</div></div></div>`:''}
 
     ${curTasks.length?`
     <div style="margin-bottom:14px">
@@ -453,6 +586,8 @@ function pageLine(line){
   const tasks = db.weekPlans.filter(t=>t.line===line);
   const weeks = [...new Set(tasks.map(t=>t.week))].sort((a,b)=>a-b);
   const done = tasks.filter(t=>t.status==='done').length;
+  const files = (db.projectFiles&&db.projectFiles[line])||[];
+  const lineColor = line==='exhibit'?'teal':'amber';
 
   return `
   <div class="page-header">
@@ -463,8 +598,29 @@ function pageLine(line){
     <button class="btn btn-amber btn-sm" onclick="openAddTask('${line}')">＋ 新增任務</button>
   </div>
   <div style="height:4px;background:var(--bg3);border-radius:2px;margin-bottom:20px">
-    <div style="height:4px;background:var(--${line==='pack'?'amber':line==='stall'?'amber':'teal'});border-radius:2px;width:${tasks.length?Math.round(done/tasks.length*100):0}%;transition:width .3s"></div>
+    <div style="height:4px;background:var(--${lineColor});border-radius:2px;width:${tasks.length?Math.round(done/tasks.length*100):0}%;transition:width .3s"></div>
   </div>
+
+  <!-- 檔案連結區 -->
+  <div class="card" style="margin-bottom:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:1px">📁 專案檔案</div>
+      <button class="btn btn-sm btn-ghost" onclick="openAddFile('${line}')">＋ 新增連結</button>
+    </div>
+    ${files.length?files.map(f=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.label)}</div>
+          <a href="${esc(f.url)}" target="_blank" style="font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">${esc(f.url)}</a>
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          <button class="btn btn-sm btn-ghost" onclick="openEditFile('${line}','${f.id}')">改名</button>
+          <button class="btn btn-sm btn-rose" onclick="deleteFile('${line}','${f.id}')">✕</button>
+        </div>
+      </div>`).join('')
+    :'<div style="font-size:12px;color:var(--text3);padding:4px 0">還沒有連結，新增情緒版、參考資料、雲端資料夾…</div>'}
+  </div>
+
   ${weeks.map(w=>{
     const wtasks = tasks.filter(t=>t.week===w);
     const wDone = wtasks.filter(t=>t.status==='done').length;
@@ -653,13 +809,20 @@ function pageVendor(){
 // ─── MEMO ───
 function pageMemo(){
   const pending = db.decisions.filter(d=>!d.resolved);
-  const resolved = db.decisions.filter(d=>d.resolved);
   return `
   <div class="page-header">
     <div><div class="page-title">隨手記</div></div>
     <div style="display:flex;gap:6px">
       <button class="btn btn-sm btn-ghost" onclick="openAddDecision()">＋ 待決策</button>
       <button class="btn btn-amber btn-sm" onclick="openAddMemo()">＋ 記錄</button>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:16px;border-color:rgba(240,184,64,.3)">
+    <div style="font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">📢 組員公告</div>
+    <textarea id="announceInput" style="min-height:72px;margin-bottom:8px" placeholder="要讓組員知道的事...">${esc(db.announce||'')}</textarea>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-amber btn-sm" onclick="saveAnnounce()">更新公告</button>
+      ${db.announceUpdatedAt?`<span style="font-size:10px;color:var(--text3)">${db.announceUpdatedAt} 更新</span>`:''}
     </div>
   </div>
   ${pending.length?`
@@ -688,22 +851,72 @@ function pageMemo(){
 function pageSettings(){
   return `
   <div class="page-header"><div class="page-title">設定</div></div>
+
   <div class="card" style="margin-bottom:12px">
-    <div style="font-weight:700;margin-bottom:12px">雲端同步</div>
+    <div style="font-weight:700;margin-bottom:12px">👤 我的名稱</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:8px">讓雲端知道是誰在編輯，防止衝突</div>
+    <div class="fg"><input type="text" id="userNameInp" placeholder="例：劭婷、A同學、B同學" value="${esc(db.userName||'')}"></div>
+    <button class="btn btn-amber btn-sm" onclick="saveUserName()">儲存名稱</button>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-weight:700;margin-bottom:12px">☁️ 雲端同步</div>
     <div class="fg"><label>Apps Script URL</label>
       <input type="url" id="apiInp" placeholder="https://script.google.com/..." value="${esc(db.apiUrl||'')}">
     </div>
-    <div style="display:flex;gap:8px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-amber btn-sm" onclick="saveApiUrl()">儲存網址</button>
       <button class="btn btn-sm btn-ghost" onclick="pullSync()">↻ 從雲端拉取</button>
+      <button class="btn btn-sm btn-ghost" onclick="checkLockStatus().then(()=>toast('已檢查鎖定狀態'))">🔍 檢查鎖定</button>
     </div>
   </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-weight:700;margin-bottom:8px">📋 使用說明</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.8">
+      <div>・每人在「我的名稱」填自己的名字</div>
+      <div>・編輯任務時系統自動鎖定，完成後自動釋放</div>
+      <div>・同時只能一人編輯，5 分鐘無操作自動解鎖</div>
+      <div>・✓ 快速完成按鈕不需要鎖定</div>
+    </div>
+  </div>
+
   <div class="card">
     <div style="font-weight:700;margin-bottom:8px;color:var(--rose)">危險</div>
     <button class="btn btn-rose btn-sm" onclick="if(confirm('確定清除？'))clearAll()">清除所有資料</button>
   </div>`;
 }
 function saveApiUrl(){ db.apiUrl=document.getElementById('apiInp').value.trim(); save(); toast('✓ 已儲存'); }
+function saveUserName(){ db.userName=document.getElementById('userNameInp').value.trim(); save(); toast('✓ 名稱已儲存'); renderAll(); }
+
+function saveAnnounce(){
+  db.announce = document.getElementById('announceInput').value.trim();
+  db.announceUpdatedAt = TODAY;
+  save();
+  if(db.apiUrl) pushSync().then(()=>toast('📢 公告已同步')).catch(()=>toast('❌ 同步失敗'));
+  else toast('📢 公告已儲存（未設定同步）');
+  renderPage();
+}
+
+// ── 匯出組員版資料 ──
+function exportTeamData(){
+  const data = {
+    updatedAt: TODAY,
+    announce: db.announce||'',
+    weekPlans: db.weekPlans
+  };
+  const blob = new Blob([
+    '<!-- 更新說明：把下面 EXPORTED = {...} 這段複製貼到 team.html 對應位置 -->\n',
+    'const EXPORTED = ',
+    JSON.stringify(data, null, 2),
+    ';'
+  ], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='team-data-'+TODAY+'.js'; a.click();
+  URL.revokeObjectURL(url);
+  toast('✓ 已匯出 team-data.js');
+}
 function clearAll(){ localStorage.removeItem(KEY); location.reload(); }
 async function pullSync(){
   if(!db.apiUrl){alert('請先設定URL');return;}
@@ -725,14 +938,22 @@ async function pullSync(){
 // ═══════════════════════════════
 function markDone(id){
   const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
-  t.status='done'; save(); renderAll(); toast('✅ 完成！');
+  t.status='done'; save();
+  syncTaskStatus(id,'done',t.note||''
+  );
+  renderAll(); toast('✅ 完成！');
 }
 function setStatus(id,status){
   const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
-  t.status=status; save(); renderAll();
+  t.status=status; save();
+  syncTaskStatus(id,status,t.note||''
+  );
+  renderAll();
 }
-function openTaskModal(id){
+async function openTaskModal(id){
   const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
+  const canEdit = await acquireLock();
+  if(!canEdit) return;
   const unlocked=isUnlocked(t);
   const deps=(t.blockedBy||[]).map(bid=>{
     const dep=db.weekPlans.find(x=>x.id===bid);
@@ -772,7 +993,11 @@ function saveTaskEdit(id){
   if(!title){toast('任務名稱不能空白');return;}
   t.text=title;
   t.note=document.getElementById('tnote').value.trim();
-  save();closeModal();renderAll();toast('✓ 已儲存');
+  save();
+  // 同步單一任務狀態到雲端（輕量）
+  syncTaskStatus(id, t.status, t.note);
+  releaseLock();
+  closeModal();renderAll();toast('✓ 已儲存');
 }
 function saveTaskNote(id){
   const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
@@ -784,11 +1009,58 @@ function deleteTask(id){
   db.weekPlans=db.weekPlans.filter(t=>t.id!==id);
   save();closeModal();renderAll();toast('已刪除');
 }
+
+// ── 檔案連結管理 ──
+function ensureFiles(line){ if(!db.projectFiles)db.projectFiles={pack:[],exhibit:[],stall:[]}; if(!db.projectFiles[line])db.projectFiles[line]=[]; }
+function openAddFile(line){
+  showModal(`
+    <div class="modal-title">新增檔案連結</div>
+    <div class="fg"><label>名稱（例：情緒版、雲端資料夾、腳本）</label><input type="text" id="flLabel" placeholder="情緒版"></div>
+    <div class="fg"><label>連結網址</label><input type="url" id="flUrl" placeholder="https://..."></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-amber" onclick="saveNewFile('${line}')">新增</button>
+    </div>`);
+}
+function saveNewFile(line){
+  const label=document.getElementById('flLabel').value.trim();
+  const url=document.getElementById('flUrl').value.trim();
+  if(!label||!url){toast('名稱和連結都要填');return;}
+  ensureFiles(line);
+  db.projectFiles[line].push({id:uid(),label,url});
+  save();closeModal();renderPage();toast('✓ 已新增');
+}
+function openEditFile(line,fid){
+  ensureFiles(line);
+  const f=(db.projectFiles[line]||[]).find(x=>x.id===fid);if(!f)return;
+  showModal(`
+    <div class="modal-title">編輯連結</div>
+    <div class="fg"><label>名稱</label><input type="text" id="flLabel" value="${esc(f.label)}"></div>
+    <div class="fg"><label>連結網址</label><input type="url" id="flUrl" value="${esc(f.url)}"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-amber" onclick="saveEditFile('${line}','${fid}')">儲存</button>
+    </div>`);
+}
+function saveEditFile(line,fid){
+  ensureFiles(line);
+  const f=(db.projectFiles[line]||[]).find(x=>x.id===fid);if(!f)return;
+  const label=document.getElementById('flLabel').value.trim();
+  const url=document.getElementById('flUrl').value.trim();
+  if(!label||!url){toast('名稱和連結都要填');return;}
+  f.label=label;f.url=url;
+  save();closeModal();renderPage();toast('✓ 已儲存');
+}
+function deleteFile(line,fid){
+  ensureFiles(line);
+  db.projectFiles[line]=(db.projectFiles[line]||[]).filter(x=>x.id!==fid);
+  save();renderPage();toast('已刪除');
+}
 function openAddTask(line){
   showModal(`
     <div class="modal-title">新增任務</div>
     <div class="fg"><label>任務內容</label><input type="text" id="ntText" placeholder="要做的事..."></div>
-    <div class="fg"><label>週次</label><input type="number" id="ntWeek" value="${CUR_WEEK}" min="1" max="20" inputmode="decimal"></div>
+    <div class="fg"><label>週次</label><input type="number" id="ntWeek" value="${CUR_WEEK}" min="1" max="20"></div>
     <div class="fg"><label>狀態</label>
       <select id="ntStatus">
         <option value="upcoming">⬜ 待辦</option>
@@ -809,7 +1081,7 @@ function saveNewTask(line){
   const note=document.getElementById('ntNote').value.trim();
   if(!text){toast('請填寫內容');return;}
   db.weekPlans.push({id:uid(),line,text,week,status,note,blockedBy:[]});
-  save();closeModal();renderPage();toast('✓ 已新增');
+  save();closeModal();renderAll();toast('✓ 已新增');
 }
 
 // ─── FEEDBACK ───
@@ -932,7 +1204,7 @@ function copyReport(){
 function generateReport(){
   const lines = ['pack','exhibit','stall'];
   const lineNames = {pack:'📦 包裝',exhibit:'🎨 畢展',stall:'🍵 擺攤'};
-  const wLeft = {pack:weeksLeft('2025-05-10'),exhibit:weeksLeft('2025-05-23'),stall:weeksLeft('2025-05-23')};
+  const wLeft = {pack:weeksLeft('2026-05-10'),exhibit:weeksLeft('2026-05-23'),stall:weeksLeft('2026-05-23')};
   const now = new Date().toLocaleDateString('zh-TW');
   let r = '';
 
@@ -1054,16 +1326,25 @@ function showModal(html){
 function closeModal(){
   const el=document.getElementById('_modal');
   if(el) el.classList.remove('open');
+  releaseLock();
 }
 
 // ═══════════════════════════════
 // INIT
 // ═══════════════════════════════
 document.getElementById('topbarDate').textContent = TODAY;
+const _uEl=document.getElementById('topbarUser');
+if(_uEl) _uEl.textContent = db.userName ? db.userName : '';
+// 若尚未設定名稱，topbar 顯示提示
+if(!db.userName && db.apiUrl){
+  setTimeout(()=>toast('⚙ 請到設定填入你的名稱', 4000), 1500);
+}
 renderAll();
 if(db.apiUrl){
   const isEmpty=!db.feedbacks.length&&!db.vendors.length;
   if(isEmpty) pullSync();
+  // 每 30 秒檢查一次鎖定狀態
+  setInterval(checkLockStatus, 30000);
 }
 setInterval(()=>{if(db.apiUrl)pushSync();},600000);
 </script>
