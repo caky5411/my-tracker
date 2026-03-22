@@ -893,7 +893,7 @@ function pageSchedule(){
     <div class="card" style="margin-bottom:10px;${isCur?'border-color:var(--amber);':''}${noClass?'opacity:.6':''}">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:${w.satC.length||w.sunC.length?'10':'0'}px">
         <span class="mono" style="font-size:12px;font-weight:700;color:${isCur?'var(--amber)':'var(--text3)'}">W${w.w}</span>
-        ${isCur?'<span style="font-size:10px;background:var(--amber);color:#000;padding:1px 6px;border-radius:10px;font-family:'DM Mono',monospace">本週</span>':''}
+        ${isCur?'<span style="font-size:10px;background:var(--amber);color:#000;padding:2px 8px;border-radius:10px">本週</span>':''}
         ${w.note?`<span style="font-size:11px;color:${w.note.includes('⚠')?'var(--rose)':w.note.includes('🎉')?'var(--teal)':'var(--blue)'};margin-left:auto">${esc(w.note)}</span>`:''}
       </div>
       ${w.satC.length||w.sunC.length?`
