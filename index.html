@@ -1,181 +1,270 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>畢製追蹤</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f4f5f8;--bg2:#ecedf2;--bg3:#e2e4eb;--card:#ffffff;--card2:#f7f8fb;
-  --border:#d8dae4;--border2:#c8cad8;
-  --text:#1a1c2e;--text2:#5a5c78;--text3:#9a9cb8;
-  --amber:#c47a00;--teal:#0a8a68;--rose:#d03060;--blue:#2060c0;--purple:#6040c0;
-  --done:#0a8a68;--current:#c47a00;--blocked:#d03060;--upcoming:#9a9cb8;
-  --r:8px;
-}
-body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none}
-.mono{font-family:'DM Mono',monospace}
-input,select,textarea{font-family:'Noto Sans TC',sans-serif;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:8px 12px;font-size:15px;width:100%;outline:none;transition:border .15s}
-input:focus,select:focus,textarea:focus{border-color:var(--amber)}
-textarea{resize:vertical;min-height:60px}
-button{font-family:'Noto Sans TC',sans-serif;cursor:pointer;border:none;border-radius:6px;font-size:13px;font-weight:500;transition:all .15s}
-.btn{padding:7px 14px;background:var(--card2);color:var(--text2);border:1px solid var(--border2)}
-.btn:hover{color:var(--text);border-color:var(--border2)}
-.btn-amber{background:rgba(240,184,64,.15);color:var(--amber);border:1px solid rgba(240,184,64,.3)}
-.btn-amber:hover{background:rgba(240,184,64,.25)}
-.btn-teal{background:rgba(45,232,176,.1);color:var(--teal);border:1px solid rgba(45,232,176,.3)}
-.btn-rose{background:rgba(240,96,128,.1);color:var(--rose);border:1px solid rgba(240,96,128,.3)}
-.btn-sm{padding:4px 10px;font-size:11px}
-.btn-ghost{background:transparent;color:var(--text3);border:1px solid var(--border)}
-.btn-ghost:hover{color:var(--text2);border-color:var(--border2)}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px}
-label{font-size:12px;color:var(--text2);font-weight:600;display:block;margin-bottom:4px;letter-spacing:.3px}
-.fg{margin-bottom:12px}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>中藥庫存管理</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
 
-/* Layout */
-.app{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:52px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0}
-.sib{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .15s;background:transparent;border:none;color:var(--text3)}
-.sib:hover{background:var(--bg3);color:var(--text)}
-.sib.active{background:var(--amber);color:#000}
-.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
-.topbar{height:48px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0}
-.topbar-title{font-size:14px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.page{flex:1;overflow-y:auto;padding:20px}
-.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px}
-.page-title{font-size:18px;font-weight:700}
-.page-sub{font-size:11px;color:var(--text3);margin-top:2px}
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f3ee;
+      --bg2: #eceae3;
+      --bg3: #e3e0d8;
+      --card: #ffffff;
+      --card2: #faf9f6;
+      --border: rgba(0,0,0,0.08);
+      --border2: rgba(0,0,0,0.14);
+      --text: #2c2c2a;
+      --text2: #5f5e5a;
+      --text3: #9a9890;
+      --red: #a32d2d;
+      --red-bg: #fcebeb;
+      --red-border: #f7c1c1;
+      --orange: #854f0b;
+      --orange-bg: #faeeda;
+      --orange-border: #fac775;
+      --green: #0f6e56;
+      --green-bg: #e6f5f1;
+      --r: 10px;
+    }
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.5;
+      overscroll-behavior: none;
+    }
 
-/* Overlay */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
-.overlay.open{display:flex}
-.modal{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:22px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto}
-.modal-title{font-size:16px;font-weight:700;margin-bottom:16px}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+    /* ── Layout ── */
+    .app { display: flex; height: 100vh; overflow: hidden; }
+    .sidebar {
+      width: 56px; background: var(--bg2);
+      border-right: 1px solid var(--border2);
+      display: flex; flex-direction: column;
+      align-items: center; padding: 14px 0; gap: 4px;
+      flex-shrink: 0;
+    }
+    .sib {
+      width: 38px; height: 38px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; cursor: pointer; transition: all .15s;
+      background: transparent; border: none; color: var(--text3);
+    }
+    .sib:hover { background: var(--bg3); color: var(--text); }
+    .sib.active { background: var(--text); color: #fff; }
+    .main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .topbar {
+      height: 50px; border-bottom: 1px solid var(--border2);
+      display: flex; align-items: center; padding: 0 16px; gap: 10px;
+      flex-shrink: 0; background: var(--card);
+    }
+    .topbar-title { font-family: 'Noto Serif TC', serif; font-size: 15px; font-weight: 700; flex: 1; }
+    .page { flex: 1; overflow-y: auto; padding: 20px; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 8px; }
+    .page-title { font-family: 'Noto Serif TC', serif; font-size: 18px; font-weight: 700; }
+    .page-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
-/* Toast */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border2);border-radius:20px;padding:8px 18px;font-size:12px;font-weight:600;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
-.toast.show{opacity:1}
+    /* ── Cards & Items ── */
+    .card {
+      background: var(--card); border-radius: var(--r);
+      padding: 16px; margin-bottom: 12px;
+      border: 1px solid var(--border);
+    }
+    .item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 14px; border: 1px solid var(--border);
+      border-radius: 8px; margin-bottom: 6px; background: var(--card);
+      transition: border-color .15s;
+    }
+    .item.low { border-color: var(--red-border); background: var(--red-bg); }
+    .item.warn { border-color: var(--orange-border); background: var(--orange-bg); }
+    .item-name { font-weight: 500; font-size: 15px; }
+    .item-stock { font-size: 13px; color: var(--text2); margin-top: 2px; }
+    .item-stock.low-text { color: var(--red); font-weight: 500; }
+    .item-stock.warn-text { color: var(--orange); font-weight: 500; }
 
-/* Status dots */
-.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sdot.done{background:var(--done)}
-.sdot.current{background:var(--amber)}
-.sdot.blocked{background:var(--rose)}
-.sdot.upcoming{background:var(--upcoming)}
+    /* ── Stats ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+    .stat { background: var(--card); border-radius: var(--r); padding: 14px; text-align: center; border: 1px solid var(--border); }
+    .stat-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+    .stat-num { font-size: 24px; font-weight: 700; font-family: 'Noto Serif TC', serif; }
+    .stat-num.danger { color: var(--red); }
 
-/* TODAY */
-.focus-card{background:linear-gradient(135deg,rgba(196,122,0,.06),rgba(196,122,0,.02));border:1px solid rgba(240,184,64,.3);border-radius:var(--r);padding:16px;margin-bottom:16px}
-.focus-label{font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px}
-.focus-text{font-size:15px;font-weight:700;line-height:1.5}
-.week-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.week-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace}
+    /* ── Tabs ── */
+    .tabs {
+      display: flex; gap: 2px; background: var(--bg3);
+      border-radius: 10px; padding: 4px; margin-bottom: 16px;
+    }
+    .tab {
+      flex: 1; padding: 9px; font-size: 13px; background: transparent;
+      border: none; border-radius: 7px; cursor: pointer; color: var(--text2);
+      font-family: 'Noto Sans TC', sans-serif; transition: all .15s;
+    }
+    .tab.active { background: var(--card); color: var(--text); font-weight: 500; }
 
-/* Task tree */
-.task-tree{display:flex;flex-direction:column;gap:6px}
-.task-node{border-radius:6px;border:1px solid var(--border);overflow:hidden;transition:border .15s}
-.task-node.unlocked{border-color:var(--border2)}
-.task-node.locked{opacity:.5}
-.task-node.done-node{opacity:.4}
-.task-head{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;background:var(--card)}
-.task-head:hover{background:var(--card2)}
-.task-name{flex:1;font-size:14px;font-weight:600}
-.task-node.locked .task-name{color:var(--text3)}
-.task-meta{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
-.task-body{padding:10px 12px 12px;background:var(--bg3);border-top:1px solid var(--border);display:none}
-.task-body.open{display:block}
-.task-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px}
-.task-deps{font-size:11px;color:var(--rose);margin-bottom:8px}
-.task-children{margin-top:8px;padding-left:12px;border-left:2px solid var(--border);display:flex;flex-direction:column;gap:4px}
+    /* ── Inputs & Buttons ── */
+    input, select, button, textarea { font-family: 'Noto Sans TC', sans-serif; font-size: 15px; }
+    input[type=text], input[type=number], input[type=date], select {
+      padding: 10px 12px; border: 1px solid var(--border2);
+      border-radius: 8px; background: var(--bg2); width: 100%;
+      color: var(--text); outline: none; transition: border .15s;
+    }
+    input:focus, select:focus { border-color: var(--text2); background: var(--card); }
+    .row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+    .row > input, .row > select { flex: 1; min-width: 0; }
+    button.btn {
+      padding: 10px 18px; border: none; border-radius: 8px;
+      background: var(--text); color: #fff; cursor: pointer;
+      font-weight: 500; transition: opacity .15s; white-space: nowrap;
+    }
+    button.btn:hover { opacity: 0.85; }
+    button.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    button.btn-mini {
+      padding: 6px 12px; font-size: 13px;
+      border: 1px solid var(--border2); background: var(--card);
+      color: var(--text2); border-radius: 6px; cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif; transition: all .15s;
+    }
+    button.btn-mini:hover { background: var(--bg2); }
+    button.btn-danger { color: var(--red); }
+    button.btn-ghost {
+      padding: 6px 12px; font-size: 13px; border: 1px solid var(--border);
+      background: transparent; color: var(--text3); border-radius: 6px;
+      cursor: pointer; font-family: 'Noto Sans TC', sans-serif; transition: all .15s;
+    }
+    button.btn-ghost:hover { color: var(--text2); border-color: var(--border2); }
 
-/* Line badge */
-.line-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0}
-.line-pack{background:rgba(160,128,240,.15);color:var(--purple)}
-.line-exhibit{background:rgba(45,232,176,.1);color:var(--teal)}
-.line-stall{background:rgba(196,122,0,.12);color:var(--amber)}
-.line-other{background:rgba(96,168,240,.1);color:var(--blue)}
+    /* ── Ingredient row ── */
+    .ingredient-row {
+      display: grid; grid-template-columns: 1fr 80px 36px;
+      gap: 6px; margin-bottom: 6px;
+    }
+    .ingredient-row select, .ingredient-row input { font-size: 14px; padding: 8px 10px; }
+    .ingredient-row .ing-remove {
+      padding: 0; font-size: 18px; line-height: 1; color: var(--red);
+      border: none; background: transparent; cursor: pointer;
+    }
 
-/* Status select */
-.status-sel{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
-.status-opt{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text3);transition:all .15s}
-.status-opt.active-done{background:rgba(45,232,176,.15);color:var(--teal);border-color:rgba(45,232,176,.4)}
-.status-opt.active-current{background:rgba(240,184,64,.15);color:var(--amber);border-color:rgba(240,184,64,.4)}
-.status-opt.active-blocked{background:rgba(240,96,128,.15);color:var(--rose);border-color:rgba(240,96,128,.4)}
-.status-opt.active-upcoming{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
+    /* ── Records ── */
+    .record {
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px 14px; margin-bottom: 8px; background: var(--card);
+    }
+    .record-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 6px;
+    }
+    .record-date { font-weight: 500; font-size: 14px; }
+    .record-list { font-size: 13px; color: var(--text2); line-height: 1.6; }
 
-/* Week plan */
-.week-plan{margin-bottom:20px}
-.week-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.week-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);padding:2px 8px;border:1px solid var(--border);border-radius:10px}
-.week-task-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:4px;cursor:pointer}
-.week-task-row:hover{border-color:var(--border2)}
-.week-task-row.done-row{opacity:.4}
-.week-task-text{flex:1;font-size:13px}
+    /* ── Alerts & Messages ── */
+    .alert-banner {
+      background: var(--red-bg); color: var(--red);
+      padding: 10px 14px; border-radius: 8px;
+      font-size: 13px; margin-bottom: 12px; display: none;
+    }
+    .alert-banner.show { display: block; }
+    .msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
+    .msg.success { color: var(--green); }
+    .msg.error { color: var(--red); }
+    .err-box {
+      background: var(--red-bg); color: #791f1f;
+      padding: 10px 14px; border-radius: 8px; font-size: 12px;
+      margin: 8px 0; font-family: monospace; white-space: pre-wrap;
+      word-break: break-all; display: none;
+    }
+    .err-box.show { display: block; }
 
-/* Memo / feedback */
-.memo-row{padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:6px}
-.memo-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin-bottom:4px}
-.memo-text{font-size:14px;line-height:1.6;white-space:pre-wrap}
+    /* ── Settings ── */
+    .settings-row { display: flex; gap: 8px; align-items: center; padding: 10px 0; }
+    .settings-row label { font-size: 14px; color: var(--text2); flex-shrink: 0; }
+    .settings-row input { width: 100px; flex: none; }
 
-/* Mobile */
-@media(max-width:640px){
-  .app{flex-direction:column}
-  .sidebar{width:100%;height:56px;flex-direction:row;justify-content:space-around;position:fixed;bottom:0;left:0;right:0;z-index:50;border-top:1px solid var(--border);border-right:none;border-bottom:none;padding:0 4px;gap:0}
-  .sib{width:44px;height:44px;border-radius:10px;font-size:18px}
-  .main{padding-bottom:56px;height:100vh}
-  .page{padding:16px 14px;font-size:15px}
-  .page-header{margin-bottom:16px}
-  .page-title{font-size:17px}
-  .topbar{height:44px;padding:0 10px;gap:6px}
-  .topbar-title{font-size:13px}
-  #topbarUser{display:none}
-  .overlay{align-items:flex-end;padding:0}
-  .modal{border-radius:16px 16px 0 0;max-width:100%;max-height:92vh;padding:20px 16px}
-  .modal-title{font-size:16px;margin-bottom:18px}
-  .focus-card{padding:14px;margin-bottom:10px!important}
-  .focus-text{font-size:15px}
-  /* 卡片間距加大 */
-  .card{padding:14px;margin-bottom:10px}
-  /* 任務列：文字換行，按鈕縮到右邊 */
-  .week-task-row{padding:12px 10px;gap:8px;flex-wrap:wrap;align-items:flex-start}
-  .week-task-text{font-size:14px;flex:1;min-width:0;line-height:1.4}
-  .memo-text{font-size:14px;line-height:1.6}
-  .memo-row{padding:14px;margin-bottom:8px}
-  .line-badge{font-size:11px;padding:3px 9px;flex-shrink:0}
-  input,select,textarea{font-size:16px !important}
-  /* 按鈕手機加大點擊區 */
-  .btn-sm{padding:7px 13px;font-size:12px}
-  .btn{padding:9px 16px}
-  .status-sel{gap:6px}
-  .status-opt{padding:7px 13px;font-size:12px}
-  .modal-footer{gap:8px;margin-top:20px}
-  .modal-footer button{padding:11px 16px;font-size:13px;flex:1}
-  /* week-task-row 的按鈕群不要被擠掉 */
-  .week-task-row > div[onclick]{flex-shrink:0}
-  /* 任務樹子項縮排小一點 */
-  .task-children{padding-left:8px}
-}
-@media(min-width:641px) and (max-width:900px){
-  .sidebar{width:44px}
-  .sib{width:32px;height:32px}
-  .page{padding:16px}
-}
-</style>
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 40px 0; color: var(--text3); font-size: 14px; }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid var(--bg3); border-top-color: var(--text2);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+      vertical-align: middle; margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Sync badge ── */
+    .sync-badge { font-size: 11px; color: var(--text3); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--text); color: #fff;
+      border-radius: 20px; padding: 8px 18px;
+      font-size: 13px; font-weight: 500;
+      z-index: 999; pointer-events: none;
+      opacity: 0; transition: opacity .3s; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ── Empty ── */
+    .empty { text-align: center; color: var(--text3); font-size: 13px; padding: 24px 0; }
+
+    /* ── Footer ── */
+    .footer { text-align: center; padding: 16px 0; font-size: 12px; color: var(--text3); }
+    .footer a { color: var(--text2); text-decoration: none; }
+
+    /* ── Overlay / Modal ── */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      z-index: 100; display: none; align-items: center;
+      justify-content: center; padding: 16px;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--card); border-radius: 14px;
+      padding: 22px; width: 100%; max-width: 440px;
+      max-height: 88vh; overflow-y: auto;
+      border: 1px solid var(--border2);
+    }
+    .modal-title { font-family: 'Noto Serif TC', serif; font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+    .fg { margin-bottom: 12px; }
+    .fg label { font-size: 12px; color: var(--text2); font-weight: 600; display: block; margin-bottom: 4px; }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      .app { flex-direction: column; }
+      .sidebar {
+        width: 100%; height: 56px; flex-direction: row;
+        justify-content: space-around; position: fixed;
+        bottom: 0; left: 0; right: 0; z-index: 50;
+        border-top: 1px solid var(--border2); border-right: none;
+        padding: 0 4px; gap: 0;
+      }
+      .sib { width: 44px; height: 44px; font-size: 19px; }
+      .main { padding-bottom: 56px; height: 100vh; }
+      .page { padding: 14px 12px; }
+      .topbar { height: 46px; padding: 0 12px; }
+      .topbar-title { font-size: 14px; }
+      .stat-num { font-size: 20px; }
+      .ingredient-row { grid-template-columns: 1fr 70px 32px; }
+      input, select { font-size: 16px !important; }
+      .overlay { align-items: flex-end; padding: 0; }
+      .modal { border-radius: 16px 16px 0 0; max-width: 100%; max-height: 92vh; padding: 20px 16px; }
+    }
+  </style>
 </head>
 <body>
 <div class="app">
   <div class="sidebar" id="sidebar"></div>
   <div class="main">
     <div class="topbar">
-      <div class="topbar-title" id="topbarTitle">畢製追蹤</div>
-      <div id="topbarUser" style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace"></div>
-      <div class="mono" style="font-size:11px;color:var(--text3)" id="topbarDate"></div>
-      <div id="lockBadge" style="display:none;font-size:10px;padding:3px 8px;border-radius:10px;font-family:'DM Mono',monospace"></div>
-      <button class="btn btn-sm btn-ghost" onclick="openWeeklyReport()" title="產生週報給 Claude">📋</button>
-      <button class="btn btn-sm btn-ghost" onclick="exportTeamData()" title="匯出組員版資料">👥</button>
-      <button class="btn btn-sm" onclick="manualSave()">💾</button>
+      <div class="topbar-title">中藥庫存管理</div>
+      <div class="sync-badge" id="syncBadge"></div>
+      <button class="btn-ghost" onclick="manualSave()" style="font-size:12px;padding:5px 10px;">💾 儲存</button>
     </div>
     <div class="page" id="pageContent"></div>
   </div>
@@ -183,1238 +272,470 @@ label{font-size:12px;color:var(--text2);font-weight:600;display:block;margin-bot
 <div class="toast" id="toast"></div>
 
 <script>
+'use strict';
+
 // ═══════════════════════════════
 // CONFIG
 // ═══════════════════════════════
-const API_URL = '';
-const KEY = 'grad_v6';
+const KEY = 'herb_v1';
 const TODAY = new Date().toISOString().slice(0,10);
-const CUR_WEEK = getWeekNum(TODAY);
-
-// 課表無課週（115學年）
-const NO_CLASS_WEEKS = [2, 7, 10]; // w2=02/28清明連假前, w7=04/04清明, w10=04/25
-
-function getWeekNum(dateStr){
-  const start = new Date('2026-02-21'); // 115學年第一週，週六02/21
-  const d = new Date(dateStr);
-  return Math.ceil((d - start) / (7*24*60*60*1000)) + 1;
-}
-function weeksLeft(deadline){
-  const d = new Date(deadline);
-  const t = new Date(TODAY);
-  return Math.ceil((d - t) / (7*24*60*60*1000));
-}
 
 // ═══════════════════════════════
 // DATA
 // ═══════════════════════════════
-function defDB(){
+function defDB() {
   return {
-    _updatedAt:'',
-    apiUrl: API_URL,
-    // 週計畫
-    weekPlans: [
-      // ── 包裝線（玫瑰品牌 · 個人畢製）──
-      // 目標：包裝設計定稿送印，截止 5/10
-      {id:'w1p1',week:1,line:'pack',text:'確定產品結構：精露噴霧、精露飲品、花醬、禮盒（不回頭）',status:'current',note:'品牌核心：屏東日照→花青素→濃郁花色'},
-      {id:'w1p2',week:1,line:'pack',text:'畫5張精露噴霧草稿（植物圖鑑風格）',status:'upcoming',note:'',blockedBy:[]},
-      {id:'w2p1',week:2,line:'pack',text:'Moodboard完成，與老師確認視覺方向',status:'upcoming',note:'白色＋玫瑰紅＋銀墨，UV感光油墨概念',blockedBy:['w1p1']},
-      {id:'w2p2',week:2,line:'pack',text:'LOGO第一版草稿',status:'upcoming',note:'',blockedBy:['w1p2']},
-      {id:'w3p1',week:3,line:'pack',text:'瓶身標籤設計提案2-3版',status:'upcoming',note:'',blockedBy:['w2p1','w2p2']},
-      {id:'w4p1',week:4,line:'pack',text:'單品包裝設計定稿，老師review',status:'upcoming',note:'',blockedBy:['w3p1']},
-      {id:'w5p1',week:5,line:'pack',text:'禮盒設計（蛋捲＋花茶組合）',status:'upcoming',note:'',blockedBy:['w4p1']},
-      {id:'w5p2',week:5,line:'pack',text:'確認UV感光油墨廠商＋詢價',status:'upcoming',note:'',blockedBy:['w4p1']},
-      {id:'w6p1',week:6,line:'pack',text:'全部包裝定稿，送印',status:'upcoming',note:'⚠ 5/10截止往前推，最晚w6送出',blockedBy:['w5p1','w5p2']},
-      {id:'w7p1',week:7,line:'pack',text:'收件確認印刷品質',status:'upcoming',note:'',blockedBy:['w6p1']},
-
-      // ── 畢展線（印刷組統籌）──
-      // 海報完稿4/17、邀請卡4/19、小卡5/19、畢展板5/11
-      {id:'e1a',week:1,line:'exhibit',text:'問老師：邀請名單哪組負責、幾人？海報張貼點？',status:'current',note:'3/22明天要問'},
-      {id:'e1b',week:1,line:'exhibit',text:'邀請卡工藝方向向老師確認（方案A/B/C）',status:'current',note:'方案C光柵欄動畫製作週期最長，要提前詢價'},
-      {id:'e1c',week:1,line:'exhibit',text:'畢展板尺寸確認（展間面積/每組分配面積/桌子尺寸）',status:'current',note:''},
-      {id:'e2a',week:2,line:'exhibit',text:'海報排版細節調整完成',status:'upcoming',note:'初版已完成',blockedBy:['e1a']},
-      {id:'e3a',week:3,line:'exhibit',text:'海報完稿 ✦ 截止4/17（四）',status:'upcoming',note:'完稿→4/19送印→4/23取件',blockedBy:['e2a']},
-      {id:'e3b',week:3,line:'exhibit',text:'邀請卡版面設計執行',status:'upcoming',note:'',blockedBy:['e1b']},
-      {id:'e3c',week:3,line:'exhibit',text:'邀請卡詢價（含工藝）',status:'upcoming',note:'',blockedBy:['e1b']},
-      {id:'e4a',week:4,line:'exhibit',text:'邀請卡完稿 ✦ 截止4/19（六）',status:'upcoming',note:'完稿→4/21送印→4/23取件',blockedBy:['e3b','e3c']},
-      {id:'e4b',week:4,line:'exhibit',text:'畢展板規範文件製作＋公告全班',status:'upcoming',note:'4/27開放上傳',blockedBy:['e1c']},
-      {id:'e4c',week:4,line:'exhibit',text:'海報/邀請卡送印對接＋取件',status:'upcoming',note:'',blockedBy:['e3a','e4a']},
-      {id:'e5a',week:5,line:'exhibit',text:'畢展板第一輪收稿截止 ✦ 5/4（日）',status:'upcoming',note:'給全班7天設計時間',blockedBy:['e4b']},
-      {id:'e5b',week:5,line:'exhibit',text:'檔案檢查：像素尺寸＋有無繳交，發退回通知',status:'upcoming',note:'5/5當天發退回通知',blockedBy:['e5a']},
-      {id:'e6a',week:6,line:'exhibit',text:'畢展板第二輪修改截止 ✦ 5/8（四）',status:'upcoming',note:'超過不保證能送印',blockedBy:['e5b']},
-      {id:'e6b',week:6,line:'exhibit',text:'作品意念小卡模板設計＋蒐集全班文字',status:'upcoming',note:'',blockedBy:[]},
-      {id:'e6c',week:6,line:'exhibit',text:'畢展板詢價（尺寸/材質/數量）',status:'upcoming',note:'三折式KT板或PP板',blockedBy:['e1c']},
-      {id:'e7a',week:7,line:'exhibit',text:'畢展板最終確認＋送印 ✦ 5/11（一）',status:'upcoming',note:'',blockedBy:['e6a','e6c']},
-      {id:'e11a',week:11,line:'exhibit',text:'作品意念小卡完稿 ✦ 5/19（一）',status:'upcoming',note:'完稿→5/21送印→5/22取件',blockedBy:['e6b']},
-      {id:'e12a',week:12,line:'exhibit',text:'展場布置：海報張貼＋小卡擺放＋識別卡發放',status:'upcoming',note:'畢展日 5/23',blockedBy:['e11a','e7a']},
-
-      // ── 擺攤線（咖啡攤位）──
-      // 攤位日 5/23，空間 60×120cm
-      {id:'s1a',week:1,line:'stall',text:'問老師：攤位確切空間尺寸',status:'current',note:'3/22明天要問'},
-      {id:'s1b',week:1,line:'stall',text:'確定品牌名稱（三人討論）',status:'current',note:''},
-      {id:'s2a',week:2,line:'stall',text:'攤位平面配置草圖（動線/生豆區/手沖區/販售區）',status:'upcoming',note:'桌面60×120cm',blockedBy:['s1a']},
-      {id:'s2b',week:2,line:'stall',text:'影片腳本完成',status:'upcoming',note:'開場烘豆→生豆挑選→香氣時刻→手沖→LOGO淡入',blockedBy:['s1b']},
-      {id:'s3a',week:3,line:'stall',text:'聯繫A同學確認拍攝日期（以他為主）',status:'upcoming',note:'拍攝地：A同學咖啡工作室',blockedBy:['s2b']},
-      {id:'s3b',week:3,line:'stall',text:'道具/器材清單確認＋採購（桌布/植栽/小黑板/立牌）',status:'upcoming',note:'',blockedBy:['s2a']},
-      {id:'s4a',week:4,line:'stall',text:'形象影片拍攝（A同學工作室）',status:'upcoming',note:'補光燈×2自備，iPhone拍攝',blockedBy:['s3a']},
-      {id:'s4b',week:4,line:'stall',text:'攤位視覺設計（背板/價目表/生豆標示卡）',status:'upcoming',note:'手繪風插圖＋極簡',blockedBy:['s2a']},
-      {id:'s4c',week:4,line:'stall',text:'背板方案確認（布幔/木紋板/牛皮紙/原牆）',status:'upcoming',note:'建議方案A棉麻布幔',blockedBy:['s1a']},
-      {id:'s5a',week:5,line:'stall',text:'影片剪輯完成輸出',status:'upcoming',note:'確認剪輯負責人',blockedBy:['s4a']},
-      {id:'s5b',week:5,line:'stall',text:'物料確認完成，送印（背板/價目表）',status:'upcoming',note:'',blockedBy:['s4b','s4c']},
-      {id:'s6a',week:6,line:'stall',text:'影片上傳測試、播放設備確認',status:'upcoming',note:'螢幕自備',blockedBy:['s5a']},
-      {id:'s7a',week:7,line:'stall',text:'IG預熱宣傳開始（烘豆畫面/神秘感）',status:'upcoming',note:'確認IG帳號歸屬',blockedBy:['s1b']},
-      {id:'s10a',week:10,line:'stall',text:'試擺攤位演練（全員）',status:'upcoming',note:'',blockedBy:['s5b','s6a']},
-      {id:'s11a',week:11,line:'stall',text:'形象影片IG發布',status:'upcoming',note:'',blockedBy:['s5a']},
-      {id:'s12a',week:12,line:'stall',text:'展前2天提醒限動＋即時記錄',status:'upcoming',note:'5/21~5/23',blockedBy:['s7a']},
-      // ── 體驗規劃 ──
-      {id:'sop1',week:3,line:'stall',text:'現場 SOP 確認：聞香免費→選豆現烘→帶走',status:'upcoming',note:'每組約10分鐘，同時只能服務一組',blockedBy:[]},
-      {id:'sop2',week:3,line:'stall',text:'定價方案確認（全員討論，A同學確認成本）',status:'upcoming',note:'建議方案B：買豆送手沖；只喝咖啡 $50',blockedBy:[]},
-      {id:'sop3',week:4,line:'stall',text:'確認手沖負責人（A烘豆，誰手沖？）',status:'upcoming',note:'B同學？先生？需提前決定',blockedBy:['sop2']},
-      {id:'sop4',week:4,line:'stall',text:'排隊方案確認（建議號碼牌制）',status:'upcoming',note:'客人抽號後可逛展，到號再回來',blockedBy:['sop1']},
-      {id:'sop5',week:5,line:'stall',text:'製作號碼牌＋等待時間告示牌',status:'upcoming',note:'手寫即可',blockedBy:['sop4']},
-      {id:'sop6',week:5,line:'stall',text:'設計沖泡建議小卡（隨豆附贈）',status:'upcoming',note:'',blockedBy:[]},
-      // ── 突發應對備案 ──
-      {id:'bk1',week:11,line:'stall',text:'展前一天：烘豆機試運作確認',status:'upcoming',note:'故障備案：改純販售＋手沖，取消現烘',blockedBy:[]},
-      {id:'bk2',week:9,line:'stall',text:'備用熟豆準備（請A同學提前烘一批）',status:'upcoming',note:'',blockedBy:[]},
-      {id:'bk3',week:9,line:'stall',text:'確認緊急代班聯絡人（A同學工作室夥伴？）',status:'upcoming',note:'',blockedBy:[]},
-      {id:'bk4',week:11,line:'stall',text:'備用零錢準備 $500＋確認行動支付方式',status:'upcoming',note:'LINE Pay / 街口？攤位上要標示清楚',blockedBy:[]},
-      {id:'bk5',week:11,line:'stall',text:'影片存到兩個裝置（手機＋備用）',status:'upcoming',note:'',blockedBy:[]},
-      // ── 當天 checklist ──
-      {id:'day1',week:12,line:'stall',text:'✓ 烘豆機正常運作',status:'upcoming',note:'',blockedBy:[]},
-      {id:'day2',week:12,line:'stall',text:'✓ 備用熟豆已帶',status:'upcoming',note:'',blockedBy:[]},
-      {id:'day3',week:12,line:'stall',text:'✓ 影片存兩個裝置',status:'upcoming',note:'',blockedBy:[]},
-      {id:'day4',week:12,line:'stall',text:'✓ 零錢備用金帶了',status:'upcoming',note:'',blockedBy:[]},
-      {id:'day5',week:12,line:'stall',text:'✓ 所有人知道基本流程',status:'upcoming',note:'最低人力：A烘豆+手沖、1人接待收費',blockedBy:[]},
-    ],
-    // 老師回饋
-    feedbacks: [],
-    // 廠商
-    vendors: [],
-    // 隨手記
-    memos: [],
-    // 待決策
-    decisions: [],
-    // 其他作業
-    assignments: [],
-    // 專案檔案連結（每個線別各自管理）
-    projectFiles: {
-      pack: [],
-      exhibit: [],
-      stall: [],
-    },
-    // 使用者名稱（區分誰在編輯）
-    userName: '',
-    // 組員公告（同步到組員版）
-    announce: '',
-    announceUpdatedAt: '',
+    _updatedAt: '',
+    apiUrl: '',
+    inventory: {},   // { 藥名: 庫存(錢) }
+    records: [],     // [{ id, date, ingredients:[{name,amount}], createdAt }]
+    threshold: 5,
   };
 }
 
-let db = (() => { try{ return JSON.parse(localStorage.getItem(KEY)) || defDB(); } catch{ return defDB(); } })();
+let db = (() => {
+  try { return JSON.parse(localStorage.getItem(KEY)) || defDB(); }
+  catch { return defDB(); }
+})();
 
-function saveDB(){
+function saveDB() {
   db._updatedAt = new Date().toISOString();
   localStorage.setItem(KEY, JSON.stringify(db));
 }
 
 // ═══════════════════════════════
-// SYNC
+// SYNC（Apps Script API）
 // ═══════════════════════════════
-function setSyncState(s){
-  const el = document.getElementById('topbarDate');
-  if(!el) return;
-  const states = {ok:'✓ 已同步',err:'✗ 同步失敗',loading:'⟳ 同步中'};
-  el.textContent = states[s] || TODAY;
-  el.style.color = s==='ok'?'var(--teal)':s==='err'?'var(--rose)':'var(--amber)';
-  if(s==='ok'||s==='err') setTimeout(()=>{el.textContent=TODAY;el.style.color='var(--text3)';},3000);
+function setSyncState(s) {
+  const el = document.getElementById('syncBadge');
+  if (!el) return;
+  const map = { ok: '✓ 已同步', err: '✗ 同步失敗', loading: '⟳ 同步中' };
+  el.textContent = map[s] || '';
+  el.style.color = s==='ok' ? 'var(--green)' : s==='err' ? 'var(--red)' : 'var(--orange)';
+  if (s==='ok'||s==='err') setTimeout(() => { el.textContent=''; }, 3000);
 }
-async function pushSync(){
-  if(!db.apiUrl) return;
-  setSyncState('loading');
-  try{
-    const resp = await fetch(db.apiUrl,{method:'POST',body:JSON.stringify({action:'saveAll',data:db})});
-    const r = await resp.json();
-    if(r.ok) setSyncState('ok'); else throw new Error(r.error);
-  }catch(e){ setSyncState('err'); console.warn(e); throw e; }
-}
-function manualSave(){
-  saveDB();
-  if(db.apiUrl) pushSync().then(()=>toast('✅ 已存檔')).catch(()=>toast('❌ 存檔失敗'));
-  else { toast('✓ 已存本機'); }
-}
-let _debTimer = null;
-function save(){ saveDB(); clearTimeout(_debTimer); _debTimer = setTimeout(()=>{ if(db.apiUrl) pushSync(); }, 3000); }
 
-// ── 鎖定機制 ──
-let _lockCheckTimer = null;
-async function acquireLock(){
-  if(!db.apiUrl) return true; // 無雲端直接允許
-  const user = db.userName||'未知使用者';
-  try{
-    const r = await fetch(db.apiUrl,{method:'POST',body:JSON.stringify({action:'lock',data:{user}})});
-    const res = await r.json();
-    if(res.ok){ updateLockBadge(true,user); return true; }
-    else{
-      toast('⚠️ '+res.user+' 正在編輯，請稍後再試',4000);
-      return false;
-    }
-  }catch(e){ return true; } // 網路失敗就允許繼續
+async function pushSync() {
+  if (!db.apiUrl) return;
+  setSyncState('loading');
+  try {
+    const resp = await fetch(db.apiUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'saveAll', data: db })
+    });
+    const r = await resp.json();
+    if (r.ok) setSyncState('ok'); else throw new Error(r.error);
+  } catch(e) { setSyncState('err'); throw e; }
 }
-async function releaseLock(){
-  if(!db.apiUrl) return;
-  const user = db.userName||'未知使用者';
-  try{
-    await fetch(db.apiUrl,{method:'POST',body:JSON.stringify({action:'unlock',data:{user}})});
-    updateLockBadge(false);
-  }catch(e){}
-}
-function updateLockBadge(locked,user=''){
-  const el=document.getElementById('lockBadge');
-  if(!el) return;
-  if(locked){
-    el.style.display='block';
-    el.textContent='🔒 編輯中';
-    el.style.background='rgba(240,184,64,.15)';
-    el.style.color='var(--amber)';
-    el.style.border='1px solid rgba(240,184,64,.3)';
-  } else {
-    el.style.display='none';
-  }
-}
-async function checkLockStatus(){
-  if(!db.apiUrl) return;
-  try{
-    const cb='_lk'+Date.now(); 
-    const r = await new Promise((res,rej)=>{
-      window[cb]=d=>{delete window[cb];res(d);};
-      const s=document.createElement('script');
-      s.onerror=()=>rej();
-      s.src=db.apiUrl+'?action=getLock&callback='+cb+'&t='+Date.now();
-      setTimeout(()=>rej(),5000);
+
+async function pullSync() {
+  if (!db.apiUrl) { alert('請先在設定填入 Apps Script 網址'); return; }
+  try {
+    const cb = '_gc' + Date.now();
+    const r = await new Promise((res, rej) => {
+      window[cb] = d => { delete window[cb]; res(d); };
+      const s = document.createElement('script');
+      s.onerror = () => rej(new Error('error'));
+      s.src = db.apiUrl + '?action=getAll&callback=' + cb + '&t=' + Date.now();
+      setTimeout(() => rej(new Error('timeout')), 15000);
       document.head.appendChild(s);
     });
-    const lockEl=document.getElementById('lockBadge');
-    if(!lockEl) return;
-    if(r.locked && r.user!==(db.userName||'')){
-      lockEl.style.display='block';
-      lockEl.textContent='🔒 '+r.user+' 編輯中';
-      lockEl.style.background='rgba(208,48,96,.1)';
-      lockEl.style.color='var(--rose)';
-      lockEl.style.border='1px solid rgba(208,48,96,.2)';
-    } else {
-      lockEl.style.display='none';
-    }
-  }catch(e){}
+    if (r && !r.error) { Object.assign(db, r); saveDB(); renderAll(); toast('✓ 已從雲端載入'); }
+  } catch(e) { toast('❌ 拉取失敗'); }
 }
 
-// ── 組員更新單一任務狀態（輕量，不送整包）──
-async function syncTaskStatus(taskId, status, note){
-  if(!db.apiUrl) return;
-  const user = db.userName||'未知使用者';
-  try{
-    const resp = await fetch(db.apiUrl,{method:'POST',body:JSON.stringify({
-      action:'updateTaskStatus',
-      data:{id:taskId, status, note, user}
-    })});
-    const r = await resp.json();
-    if(!r.ok) console.warn('syncTaskStatus failed:',r.error);
-  }catch(e){ console.warn(e); }
+let _debTimer = null;
+function save() {
+  saveDB();
+  clearTimeout(_debTimer);
+  _debTimer = setTimeout(() => { if (db.apiUrl) pushSync(); }, 3000);
+}
+
+function manualSave() {
+  saveDB();
+  if (db.apiUrl) pushSync().then(() => toast('✅ 已存檔')).catch(() => toast('❌ 存檔失敗'));
+  else toast('✓ 已存本機');
 }
 
 // ═══════════════════════════════
 // UTILS
 // ═══════════════════════════════
-const uid = () => '_'+Math.random().toString(36).slice(2,8);
+const uid = () => '_' + Math.random().toString(36).slice(2,8);
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-function toast(msg,dur=2500){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),dur);
+const fmt = n => Math.round((n||0) * 10) / 10;
+const nowStr = () => new Date().toLocaleString('zh-TW');
+
+function toast(msg, dur=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
 }
-function isUnlocked(task){
-  if(!task.blockedBy||!task.blockedBy.length) return true;
-  return task.blockedBy.every(depId=>{
-    const dep = db.weekPlans.find(t=>t.id===depId);
-    return dep && dep.status==='done';
-  });
-}
-function statusLabel(s){
-  return {done:'✅ 完成',current:'🔥 進行中',blocked:'🔒 被擋住',upcoming:'⬜ 待辦'}[s]||s;
-}
-function lineName(l){
-  return {pack:'📦 包裝',exhibit:'🎨 畢展',stall:'🍵 擺攤',other:'📌 其他'}[l]||l;
+
+function showMsg(id, text, isError) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'msg ' + (isError ? 'error' : 'success');
+  if (!isError && text) setTimeout(() => { el.textContent = ''; }, 2500);
 }
 
 // ═══════════════════════════════
 // NAV
 // ═══════════════════════════════
 const NAV = [
-  {id:'today',icon:'◈',label:'TODAY'},
-  {id:'pack',icon:'📦',label:'包裝線'},
-  {id:'exhibit',icon:'🎨',label:'畢展線'},
-  {id:'stall',icon:'🍵',label:'擺攤線'},
-  {id:'assignments',icon:'📚',label:'其他作業'},
-  {id:'feedback',icon:'💬',label:'老師回饋'},
-  {id:'vendor',icon:'🏭',label:'廠商'},
-  {id:'memo',icon:'📝',label:'隨手記'},
-  {id:'settings',icon:'⚙',label:'設定'},
-  {id:'schedule',icon:'📅',label:'課表'},
+  { id: 'inventory', icon: '草', label: '庫存' },
+  { id: 'add',       icon: '＋', label: '新增' },
+  { id: 'brew',      icon: '煮', label: '熬煮' },
+  { id: 'history',   icon: '紀', label: '紀錄' },
+  { id: 'settings',  icon: '⚙',  label: '設定' },
 ];
-let activeTab = 'today';
-let openTaskId = null;
+let activeTab = 'inventory';
 
-function renderNav(){
-  const sb = document.getElementById('sidebar');
-  sb.innerHTML = NAV.map(n=>`
+function renderNav() {
+  document.getElementById('sidebar').innerHTML = NAV.map(n => `
     <button class="sib${activeTab===n.id?' active':''}" onclick="goto('${n.id}')" title="${n.label}">
-      <span style="font-size:15px">${n.icon}</span>
+      <span style="font-size:13px;font-family:'Noto Serif TC',serif">${n.icon}</span>
     </button>`).join('');
 }
-function goto(tab){ activeTab=tab; renderAll(); }
-function renderAll(){ renderNav(); renderPage(); }
+
+function goto(tab) { activeTab = tab; renderAll(); }
+function renderAll() { renderNav(); renderPage(); }
 
 // ═══════════════════════════════
 // PAGES
 // ═══════════════════════════════
-function renderPage(){
-  const t = document.getElementById('topbarTitle');
+function renderPage() {
   const el = document.getElementById('pageContent');
-  const isMobile = window.innerWidth <= 640;
-  const titles = isMobile
-    ? {today:'TODAY',pack:'包裝線',exhibit:'畢展線',stall:'擺攤線',assignments:'其他作業',feedback:'老師回饋',vendor:'廠商',memo:'隨手記',settings:'設定',schedule:'課表'}
-    : {today:'TODAY',pack:'📦 包裝線',exhibit:'🎨 畢展線',stall:'🍵 擺攤線',assignments:'📚 其他作業',feedback:'💬 老師回饋',vendor:'🏭 廠商資料',memo:'📝 隨手記',settings:'⚙ 設定',schedule:'📅 課表'};
-  if(t) t.textContent = titles[activeTab]||'畢製追蹤';
-  switch(activeTab){
-    case 'today':       el.innerHTML = pageToday(); break;
-    case 'pack':        el.innerHTML = pageLine('pack'); break;
-    case 'exhibit':     el.innerHTML = pageLine('exhibit'); break;
-    case 'stall':       el.innerHTML = pageLine('stall'); break;
-    case 'assignments': el.innerHTML = pageAssignments(); break;
-    case 'feedback':    el.innerHTML = pageFeedback(); break;
-    case 'vendor':      el.innerHTML = pageVendor(); break;
-    case 'memo':        el.innerHTML = pageMemo(); break;
-    case 'settings':    el.innerHTML = pageSettings(); break;
-    case 'schedule':    el.innerHTML = pageSchedule(); break;
+  switch (activeTab) {
+    case 'inventory': el.innerHTML = pageInventory(); break;
+    case 'add':       el.innerHTML = pageAdd(); break;
+    case 'brew':      el.innerHTML = pageBrew(); break;
+    case 'history':   el.innerHTML = pageHistory(); break;
+    case 'settings':  el.innerHTML = pageSettings(); break;
   }
+  if (activeTab === 'brew') renderBrewIngredientsIfEmpty();
 }
 
-// ─── TODAY ───
-function pageToday(){
-  const curTasks = db.weekPlans.filter(t=>t.status==='current');
-  const unlockedTasks = db.weekPlans.filter(t=>t.status==='upcoming'&&isUnlocked(t));
-  const blockedTasks = db.weekPlans.filter(t=>t.status==='upcoming'&&!isUnlocked(t));
-  const wLeft5_10 = weeksLeft('2026-05-10');
-  const wLeft5_23 = weeksLeft('2026-05-23');  const doneCount = db.weekPlans.filter(t=>t.status==='done').length;
-  const total = db.weekPlans.length;
-  const isNoClass = NO_CLASS_WEEKS.includes(CUR_WEEK);
-
-  // current week tasks
-  const thisWeek = db.weekPlans.filter(t=>t.week===CUR_WEEK||t.status==='current');
-
-  return `
-  <div style="margin-bottom:20px">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
-      <div class="card" style="flex:1;min-width:140px;border-color:rgba(240,184,64,.3)">
-        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">包裝截止</div>
-        <div style="font-size:20px;font-weight:700;color:var(--amber);font-family:'DM Mono',monospace">${wLeft5_10}週</div>
-        <div style="font-size:10px;color:var(--text3)">5/10</div>
-      </div>
-      <div class="card" style="flex:1;min-width:140px;border-color:rgba(45,232,176,.2)">
-        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">畢展＋擺攤</div>
-        <div style="font-size:20px;font-weight:700;color:var(--teal);font-family:'DM Mono',monospace">${wLeft5_23}週</div>
-        <div style="font-size:10px;color:var(--text3)">5/23</div>
-      </div>
-      <div class="card" style="flex:1;min-width:140px">
-        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">進度</div>
-        <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace">${doneCount}/${total}</div>
-        <div style="height:4px;background:var(--bg3);border-radius:2px;margin-top:6px"><div style="height:4px;background:var(--teal);border-radius:2px;width:${Math.round(doneCount/total*100)}%"></div></div>
-      </div>
-    </div>
-
-    ${isNoClass?`<div style="background:rgba(96,168,240,.1);border:1px solid rgba(96,168,240,.3);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:18px">🚀</span><div><div style="font-size:12px;font-weight:700;color:var(--blue)">本週無課！衝刺週</div><div style="font-size:11px;color:var(--text3)">W${CUR_WEEK} 空出來了，適合推進卡住的任務</div></div></div>`:''}
-
-    ${curTasks.length?`
-    <div style="margin-bottom:14px">
-      <div style="font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">🔥 現在在做</div>
-      ${curTasks.map(t=>`
-        <div class="focus-card" style="margin-bottom:8px;cursor:pointer" onclick="openTaskModal('${t.id}')">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="line-badge line-${t.line}">${lineName(t.line)}</span>
-            <div style="flex:1;font-size:14px;font-weight:700">${esc(t.text)}</div>
-            <button class="btn btn-teal btn-sm" onclick="event.stopPropagation();markDone('${t.id}')">✓ 完成</button>
-          </div>
-          ${t.note?`<div style="font-size:11px;color:var(--text3);margin-top:6px">${esc(t.note)}</div>`:''}
-        </div>`).join('')}
-    </div>`:''}
-
-    ${unlockedTasks.length?`
-    <div style="margin-bottom:14px">
-      <div style="font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">⬜ 可以開始做</div>
-      ${unlockedTasks.slice(0,5).map(t=>`
-        <div class="week-task-row" onclick="openTaskModal('${t.id}')">
-          <span class="line-badge line-${t.line}">${lineName(t.line)}</span>
-          <div class="week-task-text">${esc(t.text)}</div>
-          <span class="mono" style="font-size:10px;color:var(--text3)">W${t.week}</span>
-          <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();setStatus('${t.id}','current')">開始</button>
-        </div>`).join('')}
-    </div>`:''}
-
-    ${blockedTasks.length?`
-    <div style="margin-bottom:14px">
-      <div style="font-size:10px;color:var(--rose);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">🔒 被前面卡住 (${blockedTasks.length})</div>
-      ${blockedTasks.slice(0,3).map(t=>{
-        const deps = (t.blockedBy||[]).map(id=>{
-          const dep=db.weekPlans.find(x=>x.id===id);
-          return dep?esc(dep.text):'?';
-        });
-        return `<div class="week-task-row locked" style="opacity:.5">
-          <span class="line-badge line-${t.line}">${lineName(t.line)}</span>
-          <div class="week-task-text">${esc(t.text)}</div>
-          <div style="font-size:10px;color:var(--rose)">等：${deps.join('、')}</div>
-        </div>`;
-      }).join('')}
-    </div>`:''}
-
-    ${db.decisions.filter(d=>!d.resolved).length?`
-    <div class="card" style="border-color:rgba(240,96,128,.3)">
-      <div style="font-size:10px;color:var(--rose);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">❓ 待決策</div>
-      ${db.decisions.filter(d=>!d.resolved).map(d=>`
-        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
-          <div style="flex:1;font-size:12px">${esc(d.text)}</div>
-          <button class="btn btn-sm btn-ghost" onclick="resolveDecision('${d.id}')">✓ 決定了</button>
-        </div>`).join('')}
-    </div>`:''}
-  </div>`;
-}
-
-// ─── LINE PAGE ───
-function pageLine(line){
-  const tasks = db.weekPlans.filter(t=>t.line===line);
-  const weeks = [...new Set(tasks.map(t=>t.week))].sort((a,b)=>a-b);
-  const done = tasks.filter(t=>t.status==='done').length;
-  const files = (db.projectFiles&&db.projectFiles[line])||[];
-  const lineColor = line==='exhibit'?'teal':'amber';
+// ─── 庫存頁 ───
+function pageInventory() {
+  const entries = Object.entries(db.inventory);
+  const sum = entries.reduce((a,[,v]) => a + v, 0);
+  const lowCount = entries.filter(([,v]) => v < db.threshold).length;
+  const lowItems = entries.filter(([,v]) => v < db.threshold).map(([n]) => n);
 
   return `
   <div class="page-header">
-    <div>
-      <div class="page-title">${lineName(line)}</div>
-      <div class="page-sub mono">完成 ${done}/${tasks.length}</div>
-    </div>
-    <button class="btn btn-amber btn-sm" onclick="openAddTask('${line}')">＋ 新增任務</button>
-  </div>
-  <div style="height:4px;background:var(--bg3);border-radius:2px;margin-bottom:20px">
-    <div style="height:4px;background:var(--${lineColor});border-radius:2px;width:${tasks.length?Math.round(done/tasks.length*100):0}%;transition:width .3s"></div>
+    <div><div class="page-title">庫存總覽</div>
+    <div class="page-sub">單位：錢</div></div>
   </div>
 
-  <!-- 檔案連結區 -->
-  <div class="card" style="margin-bottom:18px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:1px">📁 專案檔案</div>
-      <button class="btn btn-sm btn-ghost" onclick="openAddFile('${line}')">＋ 新增連結</button>
+  ${lowItems.length ? `<div class="alert-banner show">⚠ 庫存不足：${lowItems.map(n=>`${esc(n)}(${fmt(db.inventory[n])}錢)`).join('、')} 低於 ${db.threshold} 錢</div>` : ''}
+
+  <div class="stat-grid">
+    <div class="stat"><div class="stat-label">藥材種類</div><div class="stat-num">${entries.length}</div></div>
+    <div class="stat"><div class="stat-label">總庫存(錢)</div><div class="stat-num">${fmt(sum)}</div></div>
+    <div class="stat"><div class="stat-label">庫存不足</div><div class="stat-num danger">${lowCount}</div></div>
+  </div>
+
+  <div class="row" style="margin-bottom:12px">
+    <input type="text" id="search" placeholder="搜尋藥名…" oninput="renderPage()" style="flex:1" />
+    <select id="sort" style="flex:0 0 auto;width:auto" onchange="renderPage()">
+      <option value="name">依藥名</option>
+      <option value="asc">少→多</option>
+      <option value="desc">多→少</option>
+    </select>
+  </div>
+
+  <div id="inventory-list">${renderInventoryList()}</div>
+
+  <div class="card" style="margin-top:16px">
+    <div style="font-size:13px;color:var(--text2);margin-bottom:8px">庫存預警設定</div>
+    <div class="settings-row">
+      <label>低於</label>
+      <input type="number" id="threshold-input" step="0.5" min="0" value="${db.threshold}" />
+      <label>錢時警告</label>
+      <button class="btn-mini" onclick="saveThreshold()">儲存</button>
     </div>
-    ${files.length?files.map(f=>`
-      <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.label)}</div>
-          <a href="${esc(f.url)}" target="_blank" style="font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">${esc(f.url)}</a>
+  </div>
+
+  <div class="footer">
+    <a href="#" id="link-sheet" onclick="openSheetUrl(event)">📊 開啟 Google Sheets</a>
+  </div>`;
+}
+
+function renderInventoryList() {
+  const searchEl = document.getElementById('search');
+  const sortEl = document.getElementById('sort');
+  const search = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  const sort = sortEl ? sortEl.value : 'name';
+
+  let entries = Object.entries(db.inventory);
+  if (search) entries = entries.filter(([n]) => n.toLowerCase().includes(search));
+  if (sort === 'name') entries.sort((a,b) => a[0].localeCompare(b[0], 'zh-Hant'));
+  else if (sort === 'asc') entries.sort((a,b) => a[1]-b[1]);
+  else entries.sort((a,b) => b[1]-a[1]);
+
+  if (!entries.length) return '<div class="empty">尚無藥材，前往「新增」開始</div>';
+
+  const warnLevel = db.threshold * 2;
+  return entries.map(([name, stock]) => {
+    const cls = stock < db.threshold ? 'low' : stock < warnLevel ? 'warn' : '';
+    const txtCls = stock < db.threshold ? 'low-text' : stock < warnLevel ? 'warn-text' : '';
+    const tag = stock < db.threshold ? ' · ⚠ 不足' : stock < warnLevel ? ' · 注意' : '';
+    return `<div class="item ${cls}">
+      <div>
+        <div class="item-name">${esc(name)}</div>
+        <div class="item-stock ${txtCls}">${fmt(stock)} 錢${tag}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-mini" onclick="adjustHerb('${esc(name)}')">+/−</button>
+        <button class="btn-mini btn-danger" onclick="deleteHerb('${esc(name)}')">刪</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── 新增頁 ───
+function pageAdd() {
+  return `
+  <div class="page-header"><div class="page-title">新增／補貨</div></div>
+  <div class="card">
+    <div style="font-size:13px;color:var(--text2);margin-bottom:12px">同名藥材會累加庫存</div>
+    <div class="row">
+      <input type="text" id="new-name" placeholder="藥名（例：當歸）" />
+    </div>
+    <div class="row">
+      <input type="number" id="new-stock" placeholder="數量（錢）" step="0.5" min="0" />
+      <button class="btn" id="btn-add" onclick="addHerb()">加入</button>
+    </div>
+    <div class="msg" id="add-msg"></div>
+  </div>`;
+}
+
+// ─── 熬煮頁 ───
+function pageBrew() {
+  const today = TODAY;
+  return `
+  <div class="page-header"><div class="page-title">熬煮記錄</div></div>
+  <div class="card">
+    <div style="font-size:13px;color:var(--text2);margin-bottom:12px">儲存後自動從庫存扣除</div>
+    <div class="row">
+      <label style="font-size:14px;color:var(--text2);flex:0 0 auto">日期</label>
+      <input type="date" id="brew-date" value="${today}" />
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin:12px 0 6px">藥材清單</div>
+    <div id="brew-ingredients"></div>
+    <button class="btn-mini" id="btn-add-ing" onclick="addIngredientRow()" style="margin-top:4px">＋ 新增一味</button>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn" id="btn-save-brew" onclick="saveBrew()" style="flex:1">儲存並扣庫存</button>
+      <button class="btn-mini" onclick="clearBrew()">清空</button>
+    </div>
+    <div class="msg" id="brew-msg"></div>
+  </div>`;
+}
+
+function renderBrewIngredientsIfEmpty() {
+  if (!document.querySelectorAll('.ingredient-row').length) addIngredientRow();
+}
+
+function addIngredientRow() {
+  const wrap = document.getElementById('brew-ingredients');
+  if (!wrap) return;
+  const names = Object.keys(db.inventory).sort((a,b) => a.localeCompare(b,'zh-Hant'));
+  const row = document.createElement('div');
+  row.className = 'ingredient-row';
+  const optsHtml = '<option value="">選擇藥材…</option>'
+    + names.map(n => `<option value="${esc(n)}">${esc(n)} (${fmt(db.inventory[n])}錢)</option>`).join('');
+  row.innerHTML = `<select class="ing-name">${optsHtml}</select>
+    <input type="number" class="ing-amount" placeholder="錢" step="0.5" min="0" />
+    <button type="button" class="ing-remove" onclick="this.closest('.ingredient-row').remove();renderBrewIngredientsIfEmpty()">×</button>`;
+  wrap.appendChild(row);
+}
+
+function clearBrew() {
+  const wrap = document.getElementById('brew-ingredients');
+  if (wrap) wrap.innerHTML = '';
+  addIngredientRow();
+  showMsg('brew-msg','',false);
+}
+
+// ─── 紀錄頁 ───
+function pageHistory() {
+  const sorted = [...db.records].sort((a,b) => String(b.date).localeCompare(String(a.date)));
+  const now = new Date();
+  const ym = now.getFullYear() + '-' + ('0'+(now.getMonth()+1)).slice(-2);
+  const monthCount = db.records.filter(r => String(r.date).startsWith(ym)).length;
+
+  return `
+  <div class="page-header"><div class="page-title">熬煮紀錄</div></div>
+  <div class="stat-grid" style="grid-template-columns:1fr 1fr">
+    <div class="stat"><div class="stat-label">總帖數</div><div class="stat-num">${db.records.length}</div></div>
+    <div class="stat"><div class="stat-label">本月帖數</div><div class="stat-num">${monthCount}</div></div>
+  </div>
+  <div id="history-list">
+    ${sorted.length ? sorted.map(r => `
+      <div class="record">
+        <div class="record-head">
+          <div class="record-date">${esc(r.date)}</div>
+          <button class="btn-mini btn-danger" onclick="deleteRecord('${r.id}')">刪除</button>
         </div>
-        <div style="display:flex;gap:4px;flex-shrink:0">
-          <button class="btn btn-sm btn-ghost" onclick="openEditFile('${line}','${f.id}')">改名</button>
-          <button class="btn btn-sm btn-rose" onclick="deleteFile('${line}','${f.id}')">✕</button>
-        </div>
+        <div class="record-list">${r.ingredients.map(i => `${esc(i.name)} ${fmt(i.amount)}錢`).join('、')}</div>
       </div>`).join('')
-    :'<div style="font-size:12px;color:var(--text3);padding:4px 0">還沒有連結，新增情緒版、參考資料、雲端資料夾…</div>'}
-  </div>
-
-  ${weeks.map(w=>{
-    const wtasks = tasks.filter(t=>t.week===w);
-    const wDone = wtasks.filter(t=>t.status==='done').length;
-    const isCur = w===CUR_WEEK;
-    return `
-    <div class="week-plan">
-      <div class="week-header">
-        <span class="week-num" style="${isCur?'border-color:var(--amber);color:var(--amber)':''}">W${w}</span>
-        <span style="font-size:11px;color:var(--text3)">${wDone}/${wtasks.length} 完成</span>
-        ${isCur?'<span style="font-size:10px;color:var(--amber);font-family:\'DM Mono\',monospace">← 本週</span>':''}
-      </div>
-      ${wtasks.map(t=>{
-        const unlocked = isUnlocked(t);
-        return `<div class="week-task-row${t.status==='done'?' done-row':''}${!unlocked?' locked':''}" onclick="openTaskModal('${t.id}')">
-          <div class="sdot ${t.status==='done'?'done':t.status==='current'?'current':unlocked?'upcoming':'blocked'}"></div>
-          <div class="week-task-text">${esc(t.text)}</div>
-          ${t.note?`<span style="font-size:10px;color:var(--text3)">有備注</span>`:''}
-          ${!unlocked?'<span style="font-size:10px;color:var(--rose)">🔒</span>':''}
-          <div style="display:flex;gap:4px" onclick="event.stopPropagation()">
-            ${t.status!=='done'?`<button class="btn btn-sm btn-ghost" onclick="markDone('${t.id}')">✓</button>`:''}
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  }).join('')}`;
-}
-
-// ─── ASSIGNMENTS ───
-function pageAssignments(){
-  const list = db.assignments||[];
-  const pending = list.filter(a=>!a.done);
-  const done = list.filter(a=>a.done);
-  return `
-  <div class="page-header">
-    <div><div class="page-title">其他作業</div>
-    <div class="page-sub mono">${pending.length} 件待完成</div></div>
-    <button class="btn btn-amber btn-sm" onclick="openAddAssignment()">＋ 新增作業</button>
-  </div>
-  ${pending.map(a=>renderAssignmentCard(a)).join('')}
-  ${done.length?`
-    <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:2px;margin:16px 0 8px">✅ 已完成 (${done.length})</div>
-    ${done.map(a=>renderAssignmentCard(a)).join('')}
-  `:''}
-  ${!list.length?'<div style="color:var(--text3);font-size:13px;padding:20px">還沒有作業，按右上角新增</div>':''}`;
-}
-
-function renderAssignmentCard(a){
-  const daysLeft = a.deadline ? Math.ceil((new Date(a.deadline)-new Date(TODAY))/(86400000)) : null;
-  const urgent = daysLeft!==null && daysLeft<=3 && !a.done;
-  const tasks = a.tasks||[];
-  const mats = a.materials||[];
-  const doneCount = tasks.filter(t=>t.done).length;
-  return `
-  <div class="card" style="margin-bottom:10px;${a.done?'opacity:.45':''}${urgent?';border-color:var(--rose)':''}">
-    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:${tasks.length||mats.length||a.plan?'10':'0'}px">
-      <div style="flex:1">
-        <div style="font-weight:700;font-size:15px">${esc(a.name)}</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(a.course||'')}${a.deadline?` · 截止 ${a.deadline}`:''}${daysLeft!==null&&!a.done?` <span style="color:${urgent?'var(--rose)':'var(--text3)'}">(${daysLeft>0?daysLeft+'天後':daysLeft===0?'今天':'已過期'})</span>`:''}</div>
-      </div>
-      <div style="display:flex;gap:4px;flex-shrink:0">
-        ${!a.done?`<button class="btn btn-teal btn-sm" onclick="doneAssignment('${a.id}')">✓</button>`:`<button class="btn btn-ghost btn-sm" onclick="undoAssignment('${a.id}')">↩</button>`}
-        <button class="btn btn-ghost btn-sm" onclick="openEditAssignment('${a.id}')">編輯</button>
-        <button class="btn btn-ghost btn-sm" onclick="deleteAssignment('${a.id}')">✕</button>
-      </div>
-    </div>
-    ${tasks.length?`
-    <div style="margin-bottom:8px">
-      <div style="font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:4px">子任務 ${doneCount}/${tasks.length}</div>
-      ${tasks.map(t=>`
-        <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
-          <input type="checkbox" ${t.done?'checked':''} onchange="toggleSubtask('${a.id}','${t.id}',this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal);flex-shrink:0">
-          <span style="font-size:13px;${t.done?'text-decoration:line-through;color:var(--text3)':''}">${esc(t.text)}</span>
-        </div>`).join('')}
-    </div>`:''}
-    ${mats.length?`
-    <div style="margin-bottom:8px">
-      <div style="font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:4px">材料</div>
-      ${mats.map(m=>`
-        <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
-          <input type="checkbox" ${m.done?'checked':''} onchange="toggleMaterial('${a.id}','${m.id}',this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--purple);flex-shrink:0">
-          <span style="font-size:12px;color:var(--text2);${m.done?'text-decoration:line-through;color:var(--text3)':''}">${esc(m.text)}</span>
-        </div>`).join('')}
-    </div>`:''}
-    ${a.plan?`<div style="font-size:12px;color:var(--text2);padding:6px 8px;background:var(--bg3);border-radius:4px;white-space:pre-wrap">${esc(a.plan)}</div>`:''}
+    : '<div class="empty">尚無熬煮紀錄</div>'}
   </div>`;
 }
 
-function openAddAssignment(){
-  showModal(`
-    <div class="modal-title">新增作業</div>
-    <div class="fg"><label>作業名稱</label><input type="text" id="aName" placeholder="例：品牌識別設計"></div>
-    <div class="fg"><label>課名</label><input type="text" id="aCourse" placeholder="例：視覺傳達設計"></div>
-    <div class="fg"><label>截止日</label><input type="date" id="aDeadline"></div>
-    <div class="fg"><label>子任務（每行一項）</label><textarea id="aTasks" placeholder="草稿&#10;正稿&#10;輸出"></textarea></div>
-    <div class="fg"><label>材料清單（每行一項）</label><textarea id="aMats" placeholder="A3 紙&#10;黑色代針筆"></textarea></div>
-    <div class="fg"><label>製作計畫 / 備注</label><textarea id="aPlan" placeholder="時程安排或其他備注..."></textarea></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn btn-amber" onclick="saveNewAssignment()">新增</button>
-    </div>`);
-}
-
-function saveNewAssignment(){
-  const name = document.getElementById('aName').value.trim();
-  if(!name){toast('請填作業名稱');return;}
-  const tasks = document.getElementById('aTasks').value.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>({id:uid(),text:s,done:false}));
-  const mats = document.getElementById('aMats').value.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>({id:uid(),text:s,done:false}));
-  if(!db.assignments) db.assignments=[];
-  db.assignments.push({id:uid(),name,course:document.getElementById('aCourse').value.trim(),deadline:document.getElementById('aDeadline').value,tasks,materials:mats,plan:document.getElementById('aPlan').value.trim(),done:false});
-  save();closeModal();renderPage();toast('✓ 已新增');
-}
-
-function openEditAssignment(id){
-  const a=(db.assignments||[]).find(x=>x.id===id);if(!a)return;
-  showModal(`
-    <div class="modal-title">編輯作業</div>
-    <div class="fg"><label>作業名稱</label><input type="text" id="aName" value="${esc(a.name)}"></div>
-    <div class="fg"><label>課名</label><input type="text" id="aCourse" value="${esc(a.course||'')}"></div>
-    <div class="fg"><label>截止日</label><input type="date" id="aDeadline" value="${esc(a.deadline||'')}"></div>
-    <div class="fg"><label>子任務（每行一項）</label><textarea id="aTasks">${esc((a.tasks||[]).map(t=>t.text).join('\n'))}</textarea></div>
-    <div class="fg"><label>材料清單（每行一項）</label><textarea id="aMats">${esc((a.materials||[]).map(m=>m.text).join('\n'))}</textarea></div>
-    <div class="fg"><label>製作計畫 / 備注</label><textarea id="aPlan">${esc(a.plan||'')}</textarea></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn btn-amber" onclick="saveEditAssignment('${id}')">儲存</button>
-    </div>`);
-}
-
-function saveEditAssignment(id){
-  const a=(db.assignments||[]).find(x=>x.id===id);if(!a)return;
-  const name=document.getElementById('aName').value.trim();
-  if(!name){toast('請填作業名稱');return;}
-  const newTaskTexts=document.getElementById('aTasks').value.split('\n').map(s=>s.trim()).filter(Boolean);
-  a.tasks=newTaskTexts.map(text=>{const ex=(a.tasks||[]).find(t=>t.text===text);return ex||{id:uid(),text,done:false};});
-  const newMatTexts=document.getElementById('aMats').value.split('\n').map(s=>s.trim()).filter(Boolean);
-  a.materials=newMatTexts.map(text=>{const ex=(a.materials||[]).find(m=>m.text===text);return ex||{id:uid(),text,done:false};});
-  a.name=name;a.course=document.getElementById('aCourse').value.trim();a.deadline=document.getElementById('aDeadline').value;a.plan=document.getElementById('aPlan').value.trim();
-  save();closeModal();renderPage();toast('✓ 已儲存');
-}
-
-function toggleSubtask(aid,tid,checked){const a=(db.assignments||[]).find(x=>x.id===aid);if(!a)return;const t=(a.tasks||[]).find(x=>x.id===tid);if(!t)return;t.done=checked;save();}
-function toggleMaterial(aid,mid,checked){const a=(db.assignments||[]).find(x=>x.id===aid);if(!a)return;const m=(a.materials||[]).find(x=>x.id===mid);if(!m)return;m.done=checked;save();}
-function doneAssignment(id){const a=(db.assignments||[]).find(x=>x.id===id);if(!a)return;a.done=true;save();renderPage();toast('✅ 完成！');}
-function undoAssignment(id){const a=(db.assignments||[]).find(x=>x.id===id);if(!a)return;a.done=false;save();renderPage();}
-function deleteAssignment(id){if(!confirm('刪除這個作業？'))return;db.assignments=(db.assignments||[]).filter(x=>x.id!==id);save();renderPage();toast('已刪除');}
-
-// ─── FEEDBACK ───
-function pageFeedback(){
-  return `
-  <div class="page-header">
-    <div><div class="page-title">老師回饋</div></div>
-    <button class="btn btn-amber btn-sm" onclick="openAddFeedback()">＋ 記錄回饋</button>
-  </div>
-  ${db.feedbacks.length?[...db.feedbacks].reverse().map(f=>`
-    <div class="memo-row" style="border-left:3px solid ${f.line==='pack'?'var(--amber)':'var(--teal)'}">
-      <div class="memo-label">${f.date} · ${lineName(f.line)}</div>
-      <div class="memo-text">${esc(f.text)}</div>
-      ${f.action?`<div style="margin-top:6px;font-size:11px;color:var(--amber)">→ 行動：${esc(f.action)}</div>`:''}
-      <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="deleteFeedback('${f.id}')">刪除</button>
-    </div>`).join('')
-  :'<div style="color:var(--text3);font-size:13px;padding:20px">還沒有回饋記錄</div>'}`;
-}
-
-// ─── VENDOR ───
-function pageVendor(){
-  return `
-  <div class="page-header">
-    <div><div class="page-title">廠商資料</div></div>
-    <button class="btn btn-amber btn-sm" onclick="openAddVendor()">＋ 新增廠商</button>
-  </div>
-  ${db.vendors.length?db.vendors.map(v=>`
-    <div class="card" style="margin-bottom:10px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <div style="font-weight:700;flex:1">${esc(v.name)}</div>
-        <span class="line-badge line-${v.line||'other'}">${lineName(v.line||'other')}</span>
-        <button class="btn btn-ghost btn-sm" onclick="deleteVendor('${v.id}')">✕</button>
-      </div>
-      ${v.contact?`<div style="font-size:12px;color:var(--text2)">聯絡：${esc(v.contact)}</div>`:''}
-      ${v.product?`<div style="font-size:12px;color:var(--text2)">品項：${esc(v.product)}</div>`:''}
-      ${v.price?`<div style="font-size:12px;color:var(--amber)">報價：${esc(v.price)}</div>`:''}
-      ${v.note?`<div style="font-size:11px;color:var(--text3);margin-top:6px">${esc(v.note)}</div>`:''}
-    </div>`).join('')
-  :'<div style="color:var(--text3);font-size:13px;padding:20px">還沒有廠商資料</div>'}`;
-}
-
-// ─── MEMO ───
-function pageMemo(){
-  const pending = db.decisions.filter(d=>!d.resolved);
-  return `
-  <div class="page-header">
-    <div><div class="page-title">隨手記</div></div>
-    <div style="display:flex;gap:6px">
-      <button class="btn btn-sm btn-ghost" onclick="openAddDecision()">＋ 待決策</button>
-      <button class="btn btn-amber btn-sm" onclick="openAddMemo()">＋ 記錄</button>
-    </div>
-  </div>
-  <div class="card" style="margin-bottom:16px;border-color:rgba(240,184,64,.3)">
-    <div style="font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">📢 組員公告</div>
-    <textarea id="announceInput" style="min-height:72px;margin-bottom:8px" placeholder="要讓組員知道的事...">${esc(db.announce||'')}</textarea>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-amber btn-sm" onclick="saveAnnounce()">更新公告</button>
-      ${db.announceUpdatedAt?`<span style="font-size:10px;color:var(--text3)">${db.announceUpdatedAt} 更新</span>`:''}
-    </div>
-  </div>
-  ${pending.length?`
-  <div style="margin-bottom:16px">
-    <div style="font-size:10px;color:var(--rose);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">❓ 待決策 (${pending.length})</div>
-    ${pending.map(d=>`
-      <div class="memo-row" style="border-left:3px solid var(--rose)">
-        <div class="memo-text">${esc(d.text)}</div>
-        <div style="display:flex;gap:6px;margin-top:8px">
-          <button class="btn btn-teal btn-sm" onclick="resolveDecision('${d.id}')">✓ 決定了</button>
-          <button class="btn btn-ghost btn-sm" onclick="deleteDecision('${d.id}')">刪除</button>
-        </div>
-      </div>`).join('')}
-  </div>`:''}
-  <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:8px">📝 備忘</div>
-  ${[...db.memos].reverse().map(m=>`
-    <div class="memo-row">
-      <div class="memo-label">${m.date}${m.line?' · '+lineName(m.line):''}</div>
-      <div class="memo-text">${esc(m.text)}</div>
-      <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="deleteMemo('${m.id}')">刪除</button>
-    </div>`).join('')}
-  ${!db.memos.length?'<div style="color:var(--text3);font-size:13px;padding:10px">還沒有備忘</div>':''}`;
-}
-
-// ─── SCHEDULE 課表 ───
-const SCHEDULE = [
-  // 週次, 日期(六), 週六課程, 日期(日), 週日課程, 備注
-  {w:1,  sat:'02/21', satC:['實務專題','攝影實務','原型公仔模型製作','媒材探索與表現(三)'],               sun:'02/22', sunC:['品牌研究與分析','實用英文','展示規劃與行銷','時尚生活美學(四)','工藝設計與製作'], note:''},
-  {w:2,  sat:'02/28', satC:[],                                                                        sun:'03/01', sunC:['品牌研究與分析','展示規劃與行銷','時尚生活美學(四)','工藝設計與製作'],              note:'週六無課'},
-  {w:3,  sat:'03/07', satC:['實務專題','攝影實務','原型公仔模型製作','媒材探索與表現(三)'],               sun:'03/08', sunC:['實用英文','展示規劃與行銷','時尚生活美學(四)','工藝設計與製作'],                    note:''},
-  {w:4,  sat:'03/14', satC:['實務專題','攝影實務'],                                                    sun:'03/15', sunC:['品牌研究與分析','展示規劃與行銷','時尚生活美學(四)','工藝設計與製作'],              note:'週六下午無課'},
-  {w:5,  sat:'03/21', satC:['實務專題','攝影實務','原型公仔模型製作','媒材探索與表現(三)'],               sun:'03/22', sunC:['展示規劃與行銷','時尚生活美學(四)','工藝設計與製作'],                              note:''},
-  {w:6,  sat:'03/28', satC:['實務專題','攝影實務','原型公仔模型製作','媒材探索與表現(三)'],               sun:'03/29', sunC:['品牌研究與分析','實用英文','展示規劃與行銷','時尚生活美學(四)','工藝設計與製作'],  note:''},
-  {w:7,  sat:'04/04', satC:[],                                                                        sun:'04/05', sunC:[],                                                                                note:'🌸 清明連假，無課！可衝刺'},
-  {w:8,  sat:'04/11', satC:['實務專題','攝影實務','原型公仔模型製作','媒材探索與表現(三)'],               sun:'04/12', sunC:['品牌研究與分析','時尚生活美學(四)','工藝設計與製作','展示規劃與行銷'],              note:''},
-  {w:9,  sat:'04/18', satC:['實務專題','攝影實務','原型公仔模型製作','媒材探索與表現(三)'],               sun:'04/19', sunC:['實用英文','展示規劃與行銷','時尚生活美學(四)','工藝設計與製作'],                    note:'⚠ 邀請卡完稿截止'},
-  {w:10, sat:'04/25', satC:[],                                                                        sun:'04/26', sunC:[],                                                                                note:'無課！可衝刺'},
-  {w:11, sat:'05/02', satC:['攝影實務','原型公仔模型製作','媒材探索與表現(三)'],                         sun:'05/03', sunC:['品牌研究與分析','展示規劃與行銷','時尚生活美學(四)','工藝設計與製作'],              note:'⚠ 畢展板收稿週'},
-  {w:12, sat:'05/09', satC:['實務專題','攝影實務','原型公仔模型製作','媒材探索與表現(三)'],               sun:'05/10', sunC:['實用英文','展示規劃與行銷','時尚生活美學(四)','工藝設計與製作'],                    note:'⚠ 包裝截止 5/10'},
-  {w:13, sat:'05/16', satC:['實務專題','攝影實務','原型公仔模型製作','媒材探索與表現(三)'],               sun:'05/17', sunC:['品牌研究與分析','展示規劃與行銷','時尚生活美學(四)','工藝設計與製作'],              note:'🎉 畢展前一週'},
-];
-
-function pageSchedule(){
-  const sprint = SCHEDULE.filter(w=>!w.satC.length && !w.sunC.length || (w.satC.length===0 && w.w!==1));
-  return `
-  <div class="page-header">
-    <div><div class="page-title">課表</div>
-    <div class="page-sub mono">視傳四甲 · 115學年進修部</div></div>
-  </div>
-  <div class="card" style="margin-bottom:16px;background:rgba(32,96,192,.05);border-color:rgba(32,96,192,.2)">
-    <div style="font-size:10px;color:var(--blue);font-family:'DM Mono',monospace;letter-spacing:1px;margin-bottom:6px">🚀 無課週（衝刺機會）</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      ${SCHEDULE.filter(w=>w.note.includes('無課')||w.note.includes('假')).map(w=>`
-        <span style="background:rgba(32,96,192,.1);color:var(--blue);border:1px solid rgba(32,96,192,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-family:'DM Mono',monospace">W${w.w} ${w.sat}</span>
-      `).join('')}
-    </div>
-  </div>
-  ${SCHEDULE.map(w=>{
-    const isCur = w.w === CUR_WEEK;
-    const noClass = !w.satC.length && !w.sunC.length;
-    return `
-    <div class="card" style="margin-bottom:10px;${isCur?'border-color:var(--amber);':''}${noClass?'opacity:.6':''}">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:${w.satC.length||w.sunC.length?'10':'0'}px">
-        <span class="mono" style="font-size:12px;font-weight:700;color:${isCur?'var(--amber)':'var(--text3)'}">W${w.w}</span>
-        ${isCur?'<span style="font-size:10px;background:var(--amber);color:#000;padding:2px 8px;border-radius:10px">本週</span>':''}
-        ${w.note?`<span style="font-size:11px;color:${w.note.includes('⚠')?'var(--rose)':w.note.includes('🎉')?'var(--teal)':'var(--blue)'};margin-left:auto">${esc(w.note)}</span>`:''}
-      </div>
-      ${w.satC.length||w.sunC.length?`
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div>
-          <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">週六 ${w.sat}</div>
-          ${w.satC.length?w.satC.map(c=>`<div style="font-size:12px;padding:3px 0;border-bottom:1px solid var(--border);color:var(--text2)">${esc(c)}</div>`).join('')
-            :'<div style="font-size:12px;color:var(--text3)">無課</div>'}
-        </div>
-        <div>
-          <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">週日 ${w.sun}</div>
-          ${w.sunC.length?w.sunC.map(c=>`<div style="font-size:12px;padding:3px 0;border-bottom:1px solid var(--border);color:var(--text2)">${esc(c)}</div>`).join('')
-            :'<div style="font-size:12px;color:var(--text3)">無課</div>'}
-        </div>
-      </div>`:
-      `<div style="font-size:13px;color:var(--text3);text-align:center;padding:4px">整週無課</div>`}
-    </div>`;
-  }).join('')}`;
-}
-
-
-// ─── SETTINGS ───
-function pageSettings(){
+// ─── 設定頁 ───
+function pageSettings() {
   return `
   <div class="page-header"><div class="page-title">設定</div></div>
 
   <div class="card" style="margin-bottom:12px">
-    <div style="font-weight:700;margin-bottom:12px">👤 我的名稱</div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:8px">讓雲端知道是誰在編輯，防止衝突</div>
-    <div class="fg"><input type="text" id="userNameInp" placeholder="例：劭婷、A同學、B同學" value="${esc(db.userName||'')}"></div>
-    <button class="btn btn-amber btn-sm" onclick="saveUserName()">儲存名稱</button>
-  </div>
-
-  <div class="card" style="margin-bottom:12px">
-    <div style="font-weight:700;margin-bottom:12px">☁️ 雲端同步</div>
-    <div class="fg"><label>Apps Script URL</label>
-      <input type="url" id="apiInp" placeholder="https://script.google.com/..." value="${esc(db.apiUrl||'')}">
+    <div style="font-weight:700;margin-bottom:10px">☁️ 雲端同步</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">填入 Apps Script 部署網址，資料會自動同步到 Google Sheets。不填也能正常使用（只存本機）。</div>
+    <div class="fg">
+      <label>Apps Script 網址</label>
+      <input type="url" id="apiInp" placeholder="https://script.google.com/macros/s/.../exec" value="${esc(db.apiUrl||'')}" />
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-amber btn-sm" onclick="saveApiUrl()">儲存網址</button>
-      <button class="btn btn-sm btn-ghost" onclick="pullSync()">↻ 從雲端拉取</button>
-      <button class="btn btn-sm btn-ghost" onclick="checkLockStatus().then(()=>toast('已檢查鎖定狀態'))">🔍 檢查鎖定</button>
-    </div>
-  </div>
-
-  <div class="card" style="margin-bottom:12px">
-    <div style="font-weight:700;margin-bottom:8px">📋 使用說明</div>
-    <div style="font-size:12px;color:var(--text2);line-height:1.8">
-      <div>・每人在「我的名稱」填自己的名字</div>
-      <div>・編輯任務時系統自動鎖定，完成後自動釋放</div>
-      <div>・同時只能一人編輯，5 分鐘無操作自動解鎖</div>
-      <div>・✓ 快速完成按鈕不需要鎖定</div>
+      <button class="btn" onclick="saveApiUrl()">儲存網址</button>
+      <button class="btn-ghost" onclick="pullSync()">↻ 從雲端拉取</button>
     </div>
   </div>
 
   <div class="card">
-    <div style="font-weight:700;margin-bottom:8px;color:var(--rose)">危險</div>
-    <button class="btn btn-rose btn-sm" onclick="if(confirm('確定清除？'))clearAll()">清除所有資料</button>
+    <div style="font-weight:700;margin-bottom:8px;color:var(--red)">危險</div>
+    <button class="btn-mini btn-danger" onclick="if(confirm('確定清除所有本機資料？'))clearAll()">清除所有本機資料</button>
   </div>`;
 }
-function saveApiUrl(){ db.apiUrl=document.getElementById('apiInp').value.trim(); save(); toast('✓ 已儲存'); }
-function saveUserName(){ db.userName=document.getElementById('userNameInp').value.trim(); save(); toast('✓ 名稱已儲存'); renderAll(); }
 
-function saveAnnounce(){
-  db.announce = document.getElementById('announceInput').value.trim();
-  db.announceUpdatedAt = TODAY;
+// ═══════════════════════════════
+// ACTIONS
+// ═══════════════════════════════
+
+function addHerb() {
+  const name = (document.getElementById('new-name').value || '').trim();
+  const amount = parseFloat(document.getElementById('new-stock').value);
+  if (!name) { showMsg('add-msg','請輸入藥名',true); return; }
+  if (isNaN(amount) || amount < 0) { showMsg('add-msg','數量無效',true); return; }
+  const btn = document.getElementById('btn-add');
+  btn.disabled = true;
+  const cur = db.inventory[name] || 0;
+  db.inventory[name] = Math.round((cur + amount) * 100) / 100;
   save();
-  if(db.apiUrl) pushSync().then(()=>toast('📢 公告已同步')).catch(()=>toast('❌ 同步失敗'));
-  else toast('📢 公告已儲存（未設定同步）');
-  renderPage();
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-stock').value = '';
+  showMsg('add-msg', `✓ 已加入：${name}（${fmt(db.inventory[name])} 錢）`, false);
+  btn.disabled = false;
 }
 
-// ── 匯出組員版資料 ──
-function exportTeamData(){
-  const data = {
-    updatedAt: TODAY,
-    announce: db.announce||'',
-    weekPlans: db.weekPlans
-  };
-  const blob = new Blob([
-    '<!-- 更新說明：把下面 EXPORTED = {...} 這段複製貼到 team.html 對應位置 -->\n',
-    'const EXPORTED = ',
-    JSON.stringify(data, null, 2),
-    ';'
-  ], {type:'text/plain'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href=url; a.download='team-data-'+TODAY+'.js'; a.click();
-  URL.revokeObjectURL(url);
-  toast('✓ 已匯出 team-data.js');
-}
-function clearAll(){ localStorage.removeItem(KEY); location.reload(); }
-async function pullSync(){
-  if(!db.apiUrl){alert('請先設定URL');return;}
-  try{
-    const r = await new Promise((res,rej)=>{
-      const cb='_gc'+Date.now(); window[cb]=d=>{delete window[cb];res(d);};
-      const s=document.createElement('script');
-      s.onerror=()=>rej(new Error('error'));
-      s.src=db.apiUrl+'?action=getAll&callback='+cb+'&t='+Date.now();
-      setTimeout(()=>rej(new Error('timeout')),15000);
-      document.head.appendChild(s);
-    });
-    if(r&&!r.error){ Object.assign(db,r); saveDB(); renderAll(); toast('✓ 已從雲端載入'); }
-  }catch(e){ toast('❌ 拉取失敗'); }
+function adjustHerb(name) {
+  const cur = db.inventory[name];
+  if (cur === undefined) return;
+  const v = prompt(`調整「${name}」庫存（目前 ${fmt(cur)} 錢）\n輸入 +5 增加、-3 減少、或直接輸入新數值`);
+  if (v === null) return;
+  const trimmed = v.trim();
+  let newVal;
+  if (trimmed.charAt(0) === '+' || trimmed.charAt(0) === '-') {
+    const delta = parseFloat(trimmed);
+    if (isNaN(delta)) return;
+    newVal = cur + delta;
+  } else {
+    newVal = parseFloat(trimmed);
+    if (isNaN(newVal)) return;
+  }
+  newVal = Math.max(0, Math.round(newVal * 100) / 100);
+  db.inventory[name] = newVal;
+  save(); renderAll(); toast(`✓ ${name} 調整為 ${fmt(newVal)} 錢`);
 }
 
-// ═══════════════════════════════
-// TASK ACTIONS
-// ═══════════════════════════════
-function markDone(id){
-  const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
-  t.status='done'; save();
-  syncTaskStatus(id,'done',t.note||''
-  );
-  renderAll(); toast('✅ 完成！');
+function deleteHerb(name) {
+  if (!confirm(`確定刪除「${name}」？`)) return;
+  delete db.inventory[name];
+  save(); renderAll(); toast('已刪除');
 }
-function setStatus(id,status){
-  const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
-  t.status=status; save();
-  syncTaskStatus(id,status,t.note||''
-  );
-  renderAll();
-}
-async function openTaskModal(id){
-  const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
-  const canEdit = await acquireLock();
-  if(!canEdit) return;
-  const unlocked=isUnlocked(t);
-  const deps=(t.blockedBy||[]).map(bid=>{
-    const dep=db.weekPlans.find(x=>x.id===bid);
-    return dep?`<span style="color:var(--rose)">${esc(dep.text)}</span>`:'?';
+
+function saveBrew() {
+  const date = (document.getElementById('brew-date')||{}).value;
+  if (!date) { showMsg('brew-msg','請選擇日期',true); return; }
+
+  const rows = document.querySelectorAll('.ingredient-row');
+  const ingredients = [];
+  const errors = [];
+
+  rows.forEach(row => {
+    const name = row.querySelector('.ing-name').value;
+    const amount = parseFloat(row.querySelector('.ing-amount').value);
+    if (!name || isNaN(amount) || amount <= 0) return;
+    if (!(name in db.inventory)) { errors.push(`${name} 不在庫存中`); return; }
+    if (db.inventory[name] < amount) {
+      errors.push(`${name} 庫存不足（剩 ${fmt(db.inventory[name])} 錢，需 ${amount} 錢）`);
+    }
+    ingredients.push({ name, amount });
   });
-  showModal(`
-    <div class="modal-title">編輯任務</div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-      <span class="line-badge line-${t.line}">${lineName(t.line)}</span>
-      <span class="mono" style="font-size:11px;color:var(--text3)">W${t.week}</span>
-      ${!unlocked?`<span style="font-size:11px;color:var(--rose)">🔒 被擋住</span>`:''}
-    </div>
-    ${deps.length?`<div style="font-size:11px;margin-bottom:12px">需先完成：${deps.join('、')}</div>`:''}
-    <div class="fg"><label>任務名稱</label>
-      <input type="text" id="ttitle" value="${esc(t.text)}">
-    </div>
-    <div style="margin-bottom:12px">
-      <label>狀態</label>
-      <div class="status-sel">
-        ${['done','current','upcoming'].map(s=>`
-          <button class="status-opt${t.status===s?' active-'+s:''}" onclick="setStatus('${id}','${s}');closeModal()">${statusLabel(s)}</button>
-        `).join('')}
-      </div>
-    </div>
-    <div class="fg"><label>備注</label>
-      <textarea id="tnote">${esc(t.note||'')}</textarea>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-rose btn-sm" onclick="deleteTask('${id}')">刪除</button>
-      <button class="btn" onclick="closeModal()">關閉</button>
-      <button class="btn btn-amber" onclick="saveTaskEdit('${id}')">儲存</button>
-    </div>`);
-}
-function saveTaskEdit(id){
-  const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
-  const title=document.getElementById('ttitle').value.trim();
-  if(!title){toast('任務名稱不能空白');return;}
-  t.text=title;
-  t.note=document.getElementById('tnote').value.trim();
+
+  if (!ingredients.length) { showMsg('brew-msg','請至少加入一味有效的藥材',true); return; }
+  if (errors.length) { showMsg('brew-msg', errors.join('；'), true); return; }
+
+  const btn = document.getElementById('btn-save-brew');
+  btn.disabled = true;
+  showMsg('brew-msg','儲存中…',false);
+
+  // 扣庫存
+  ingredients.forEach(it => {
+    db.inventory[it.name] = Math.round((db.inventory[it.name] - it.amount) * 100) / 100;
+  });
+
+  // 新增紀錄
+  db.records.push({ id: uid(), date, ingredients, createdAt: nowStr() });
   save();
-  // 同步單一任務狀態到雲端（輕量）
-  syncTaskStatus(id, t.status, t.note);
-  releaseLock();
-  closeModal();renderAll();toast('✓ 已儲存');
-}
-function saveTaskNote(id){
-  const t=db.weekPlans.find(x=>x.id===id);if(!t)return;
-  t.note=document.getElementById('tnote').value.trim();
-  save();closeModal();renderPage();toast('✓ 已儲存');
-}
-function deleteTask(id){
-  if(!confirm('刪除這個任務？'))return;
-  db.weekPlans=db.weekPlans.filter(t=>t.id!==id);
-  save();closeModal();renderAll();toast('已刪除');
+
+  clearBrew();
+  showMsg('brew-msg','✓ 已記錄並扣除庫存',false);
+  btn.disabled = false;
 }
 
-// ── 檔案連結管理 ──
-function ensureFiles(line){ if(!db.projectFiles)db.projectFiles={pack:[],exhibit:[],stall:[]}; if(!db.projectFiles[line])db.projectFiles[line]=[]; }
-function openAddFile(line){
-  showModal(`
-    <div class="modal-title">新增檔案連結</div>
-    <div class="fg"><label>名稱（例：情緒版、雲端資料夾、腳本）</label><input type="text" id="flLabel" placeholder="情緒版"></div>
-    <div class="fg"><label>連結網址</label><input type="url" id="flUrl" placeholder="https://..."></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn btn-amber" onclick="saveNewFile('${line}')">新增</button>
-    </div>`);
-}
-function saveNewFile(line){
-  const label=document.getElementById('flLabel').value.trim();
-  const url=document.getElementById('flUrl').value.trim();
-  if(!label||!url){toast('名稱和連結都要填');return;}
-  ensureFiles(line);
-  db.projectFiles[line].push({id:uid(),label,url});
-  save();closeModal();renderPage();toast('✓ 已新增');
-}
-function openEditFile(line,fid){
-  ensureFiles(line);
-  const f=(db.projectFiles[line]||[]).find(x=>x.id===fid);if(!f)return;
-  showModal(`
-    <div class="modal-title">編輯連結</div>
-    <div class="fg"><label>名稱</label><input type="text" id="flLabel" value="${esc(f.label)}"></div>
-    <div class="fg"><label>連結網址</label><input type="url" id="flUrl" value="${esc(f.url)}"></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn btn-amber" onclick="saveEditFile('${line}','${fid}')">儲存</button>
-    </div>`);
-}
-function saveEditFile(line,fid){
-  ensureFiles(line);
-  const f=(db.projectFiles[line]||[]).find(x=>x.id===fid);if(!f)return;
-  const label=document.getElementById('flLabel').value.trim();
-  const url=document.getElementById('flUrl').value.trim();
-  if(!label||!url){toast('名稱和連結都要填');return;}
-  f.label=label;f.url=url;
-  save();closeModal();renderPage();toast('✓ 已儲存');
-}
-function deleteFile(line,fid){
-  ensureFiles(line);
-  db.projectFiles[line]=(db.projectFiles[line]||[]).filter(x=>x.id!==fid);
-  save();renderPage();toast('已刪除');
-}
-function openAddTask(line){
-  showModal(`
-    <div class="modal-title">新增任務</div>
-    <div class="fg"><label>任務內容</label><input type="text" id="ntText" placeholder="要做的事..."></div>
-    <div class="fg"><label>週次</label><input type="number" id="ntWeek" value="${CUR_WEEK}" min="1" max="20"></div>
-    <div class="fg"><label>狀態</label>
-      <select id="ntStatus">
-        <option value="upcoming">⬜ 待辦</option>
-        <option value="current">🔥 進行中</option>
-        <option value="done">✅ 完成</option>
-      </select>
-    </div>
-    <div class="fg"><label>備注</label><textarea id="ntNote"></textarea></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn btn-amber" onclick="saveNewTask('${line}')">新增</button>
-    </div>`);
-}
-function saveNewTask(line){
-  const text=document.getElementById('ntText').value.trim();
-  const week=parseInt(document.getElementById('ntWeek').value)||CUR_WEEK;
-  const status=document.getElementById('ntStatus').value;
-  const note=document.getElementById('ntNote').value.trim();
-  if(!text){toast('請填寫內容');return;}
-  db.weekPlans.push({id:uid(),line,text,week,status,note,blockedBy:[]});
-  save();closeModal();renderAll();toast('✓ 已新增');
+function deleteRecord(id) {
+  if (!confirm('刪除此筆紀錄？（不會回補庫存）')) return;
+  db.records = db.records.filter(r => r.id !== id);
+  save(); renderPage(); toast('已刪除');
 }
 
-// ─── FEEDBACK ───
-function openAddFeedback(){
-  showModal(`
-    <div class="modal-title">記錄老師回饋</div>
-    <div class="fg"><label>日期</label><input type="date" id="fDate" value="${TODAY}"></div>
-    <div class="fg"><label>線別</label>
-      <select id="fLine"><option value="pack">📦 包裝</option><option value="exhibit">🎨 畢展</option></select>
-    </div>
-    <div class="fg"><label>老師說了什麼</label><textarea id="fText" placeholder="回饋內容..."></textarea></div>
-    <div class="fg"><label>→ 我要做什麼（行動）</label><input type="text" id="fAction" placeholder="具體要做的事..."></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn btn-amber" onclick="saveFeedback()">儲存</button>
-    </div>`);
-}
-function saveFeedback(){
-  const text=document.getElementById('fText').value.trim();
-  if(!text){toast('請填寫內容');return;}
-  db.feedbacks.push({id:uid(),date:document.getElementById('fDate').value,line:document.getElementById('fLine').value,text,action:document.getElementById('fAction').value.trim()});
-  save();closeModal();renderPage();toast('✓ 已記錄');
-}
-function deleteFeedback(id){ if(!confirm('刪除？'))return;db.feedbacks=db.feedbacks.filter(f=>f.id!==id);save();renderPage(); }
-
-// ─── VENDOR ───
-function openAddVendor(){
-  showModal(`
-    <div class="modal-title">新增廠商</div>
-    <div class="fg"><label>廠商名稱</label><input type="text" id="vName" placeholder="印刷廠、紙廠..."></div>
-    <div class="fg"><label>用途</label>
-      <select id="vLine"><option value="pack">📦 包裝</option><option value="exhibit">🎨 畢展</option><option value="other">其他</option></select>
-    </div>
-    <div class="fg"><label>聯絡方式</label><input type="text" id="vContact" placeholder="電話、LINE..."></div>
-    <div class="fg"><label>品項/工藝</label><input type="text" id="vProduct" placeholder="UV感光、銀墨、盒型..."></div>
-    <div class="fg"><label>報價</label><input type="text" id="vPrice" placeholder="NT$..."></div>
-    <div class="fg"><label>備注</label><textarea id="vNote"></textarea></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn btn-amber" onclick="saveVendor()">儲存</button>
-    </div>`);
-}
-function saveVendor(){
-  const name=document.getElementById('vName').value.trim();
-  if(!name){toast('請填廠商名稱');return;}
-  db.vendors.push({id:uid(),name,line:document.getElementById('vLine').value,contact:document.getElementById('vContact').value.trim(),product:document.getElementById('vProduct').value.trim(),price:document.getElementById('vPrice').value.trim(),note:document.getElementById('vNote').value.trim()});
-  save();closeModal();renderPage();toast('✓ 已新增');
-}
-function deleteVendor(id){ if(!confirm('刪除？'))return;db.vendors=db.vendors.filter(v=>v.id!==id);save();renderPage(); }
-
-// ─── MEMO ───
-function openAddMemo(){
-  showModal(`
-    <div class="modal-title">新增備忘</div>
-    <div class="fg"><label>線別（選填）</label>
-      <select id="mLine"><option value="">不分類</option><option value="pack">📦 包裝</option><option value="exhibit">🎨 畢展</option></select>
-    </div>
-    <div class="fg"><label>內容</label><textarea id="mText" placeholder="想法、待辦、任何東西..."></textarea></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn btn-amber" onclick="saveMemo()">儲存</button>
-    </div>`);
-}
-function saveMemo(){
-  const text=document.getElementById('mText').value.trim();
-  if(!text){toast('請填寫內容');return;}
-  db.memos.push({id:uid(),date:TODAY,line:document.getElementById('mLine').value,text});
-  save();closeModal();renderPage();toast('✓ 已記錄');
-}
-function deleteMemo(id){ db.memos=db.memos.filter(m=>m.id!==id);save();renderPage(); }
-
-// ─── DECISION ───
-function openAddDecision(){
-  showModal(`
-    <div class="modal-title">新增待決策</div>
-    <div class="fg"><label>需要決定的事</label><textarea id="dText" placeholder="例：包裝結構選A還是B？"></textarea></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn btn-rose" onclick="saveDecision()">加入</button>
-    </div>`);
-}
-function saveDecision(){
-  const text=document.getElementById('dText').value.trim();
-  if(!text){toast('請填寫內容');return;}
-  db.decisions.push({id:uid(),text,resolved:false,date:TODAY});
-  save();closeModal();renderPage();toast('✓ 已加入');
-}
-function resolveDecision(id){ const d=db.decisions.find(x=>x.id===id);if(d){d.resolved=true;save();renderPage();toast('✓ 決策完成');} }
-function deleteDecision(id){ db.decisions=db.decisions.filter(d=>d.id!==id);save();renderPage(); }
-
-// ═══════════════════════════════
-// WEEKLY REPORT
-// ═══════════════════════════════
-function openWeeklyReport(){
-  const report = generateReport();
-  showModal(`
-    <div class="modal-title">📋 週報 — 貼給 Claude</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:10px">複製以下內容，貼給 Claude 討論進度或調整任務</div>
-    <textarea id="reportText" style="font-size:12px;font-family:'DM Mono',monospace;line-height:1.6;min-height:320px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:12px;width:100%;resize:vertical" readonly>${report}</textarea>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">關閉</button>
-      <button class="btn btn-amber" onclick="copyReport()">複製全部</button>
-    </div>`);
-  // auto-select
-  setTimeout(()=>{const el=document.getElementById('reportText');if(el){el.select();}},100);
+function saveThreshold() {
+  const v = parseFloat(document.getElementById('threshold-input').value);
+  if (isNaN(v) || v < 0) { alert('數值無效'); return; }
+  db.threshold = v;
+  save(); renderAll(); toast('✓ 預警值已更新');
 }
 
-function copyReport(){
-  const el=document.getElementById('reportText');
-  if(!el)return;
-  el.select();
-  try{
-    navigator.clipboard.writeText(el.value).then(()=>toast('✓ 已複製！貼給 Claude 吧'));
-  }catch(e){
-    document.execCommand('copy');
-    toast('✓ 已複製！');
-  }
+function saveApiUrl() {
+  db.apiUrl = (document.getElementById('apiInp').value || '').trim();
+  save(); toast('✓ 已儲存');
 }
 
-function generateReport(){
-  const lines = ['pack','exhibit','stall'];
-  const lineNames = {pack:'📦 包裝',exhibit:'🎨 畢展',stall:'🍵 擺攤'};
-  const wLeft = {pack:weeksLeft('2026-05-10'),exhibit:weeksLeft('2026-05-23'),stall:weeksLeft('2026-05-23')};
-  const now = new Date().toLocaleDateString('zh-TW');
-  let r = '';
-
-  r += `═══════════════════════════\n`;
-  r += `畢製週報 ${now}（W${CUR_WEEK}）\n`;
-  r += `═══════════════════════════\n\n`;
-
-  // 各線進度
-  r += `【各線進度】\n`;
-  lines.forEach(line=>{
-    const tasks = db.weekPlans.filter(t=>t.line===line);
-    const done = tasks.filter(t=>t.status==='done').length;
-    const pct = tasks.length ? Math.round(done/tasks.length*100) : 0;
-    const bar = '█'.repeat(Math.round(pct/10))+'░'.repeat(10-Math.round(pct/10));
-    r += `${lineNames[line]}  ${bar}  ${done}/${tasks.length} (${pct}%)  剩 ${wLeft[line]} 週\n`;
-  });
-  r += '\n';
-
-  // 本週完成
-  const doneThisWeek = db.weekPlans.filter(t=>t.status==='done'&&t.week===CUR_WEEK);
-  r += `【本週完成】\n`;
-  if(doneThisWeek.length){
-    doneThisWeek.forEach(t=>{ r+=`✅ [${lineNames[t.line]}] ${t.text}\n`; });
-  } else {
-    r += `（本週尚無完成任務）\n`;
-  }
-  r += '\n';
-
-  // 進行中
-  const current = db.weekPlans.filter(t=>t.status==='current');
-  r += `【現在進行中】\n`;
-  if(current.length){
-    current.forEach(t=>{ r+=`🔥 [${lineNames[t.line]||t.line}] ${t.text}${t.note?'  →備注：'+t.note:''}\n`; });
-  } else {
-    r += `（無進行中任務）\n`;
-  }
-  r += '\n';
-
-  // 被擋住
-  const blocked = db.weekPlans.filter(t=>t.status==='upcoming'&&!isUnlocked(t));
-  r += `【被擋住的任務】\n`;
-  if(blocked.length){
-    blocked.forEach(t=>{
-      const deps=(t.blockedBy||[]).map(id=>{const d=db.weekPlans.find(x=>x.id===id);return d?d.text:'?';});
-      r+=`🔒 [${lineNames[t.line]||t.line}] ${t.text}\n    等待：${deps.join('、')}\n`;
-    });
-  } else {
-    r += `（無被擋住任務）\n`;
-  }
-  r += '\n';
-
-  // 可以開始但還沒開始
-  const unlocked = db.weekPlans.filter(t=>t.status==='upcoming'&&isUnlocked(t));
-  r += `【可以開始但還沒動】\n`;
-  if(unlocked.length){
-    unlocked.slice(0,6).forEach(t=>{ r+=`⬜ [${lineNames[t.line]||t.line}] W${t.week} ${t.text}\n`; });
-    if(unlocked.length>6) r+=`    ...還有 ${unlocked.length-6} 個\n`;
-  } else {
-    r += `（無）\n`;
-  }
-  r += '\n';
-
-  // 其他作業
-  const assignments = db.assignments||[];
-  const pendingA = assignments.filter(a=>!a.done);
-  r += `【其他作業】\n`;
-  if(pendingA.length){
-    pendingA.forEach(a=>{
-      const total=(a.tasks||[]).length;
-      const done=(a.tasks||[]).filter(t=>t.done).length;
-      const daysLeft=a.deadline?Math.ceil((new Date(a.deadline)-new Date(TODAY))/86400000):null;
-      r+=`📚 ${a.name}${a.course?' ('+a.course+')':''}`;
-      if(daysLeft!==null) r+=`  截止${daysLeft>0?daysLeft+'天後':daysLeft===0?'今天':'已過期'}`;
-      if(total) r+=`  子任務 ${done}/${total}`;
-      r+='\n';
-    });
-  } else {
-    r += `（無待完成作業）\n`;
-  }
-  r += '\n';
-
-  // 老師回饋（最近2筆）
-  const recentFeedback = [...(db.feedbacks||[])].reverse().slice(0,2);
-  if(recentFeedback.length){
-    r += `【最近老師回饋】\n`;
-    recentFeedback.forEach(f=>{
-      r+=`💬 ${f.date} [${lineNames[f.line]||f.line}] ${f.text}`;
-      if(f.action) r+=`\n    → 行動：${f.action}`;
-      r+='\n';
-    });
-    r+='\n';
-  }
-
-  // 卡住的地方（待決策）
-  const decisions=(db.decisions||[]).filter(d=>!d.resolved);
-  r += `【卡住／待決策】\n`;
-  if(decisions.length){
-    decisions.forEach(d=>{ r+=`❓ ${d.text}\n`; });
-  } else {
-    r += `（無待決策項目）\n`;
-  }
-
-  r += '\n═══════════════════════════\n';
-  r += `以上是我的現況，請幫我分析或調整任務。\n`;
-
-  return r;
+function clearAll() {
+  localStorage.removeItem(KEY);
+  location.reload();
 }
 
-// ═══════════════════════════════
-// MODAL
-// ═══════════════════════════════
-function showModal(html){
-  let el=document.getElementById('_modal');
-  if(!el){el=document.createElement('div');el.id='_modal';el.className='overlay';document.body.appendChild(el);}
-  el.innerHTML=`<div class="modal">${html}</div>`;
-  el.classList.add('open');
-  el.onclick=e=>{if(e.target===el)closeModal();};
-}
-function closeModal(){
-  const el=document.getElementById('_modal');
-  if(el) el.classList.remove('open');
-  releaseLock();
+function openSheetUrl(e) {
+  e.preventDefault();
+  if (!db.apiUrl) { alert('請先在設定填入 Apps Script 網址'); return; }
+  // 嘗試從 API 取 sheet URL
+  const url = db.apiUrl + '?action=getSheetUrl&t=' + Date.now();
+  const cb = '_su' + Date.now();
+  window[cb] = d => { delete window[cb]; if (d && d.url) window.open(d.url,'_blank'); };
+  const s = document.createElement('script');
+  s.src = url + '&callback=' + cb;
+  document.head.appendChild(s);
 }
 
 // ═══════════════════════════════
 // INIT
 // ═══════════════════════════════
-document.getElementById('topbarDate').textContent = TODAY;
-const _uEl=document.getElementById('topbarUser');
-if(_uEl) _uEl.textContent = db.userName ? db.userName : '';
-// 若尚未設定名稱，topbar 顯示提示
-if(!db.userName && db.apiUrl){
-  setTimeout(()=>toast('⚙ 請到設定填入你的名稱', 4000), 1500);
-}
 renderAll();
-if(db.apiUrl){
-  const isEmpty=!db.feedbacks.length&&!db.vendors.length;
-  if(isEmpty) pullSync();
-  // 每 30 秒檢查一次鎖定狀態
-  setInterval(checkLockStatus, 30000);
-}
-setInterval(()=>{if(db.apiUrl)pushSync();},600000);
+// 10分鐘自動同步
+setInterval(() => { if (db.apiUrl) pushSync(); }, 600000);
 </script>
 </body>
 </html>
